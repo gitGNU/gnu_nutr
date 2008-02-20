@@ -1,0 +1,13 @@
+0^Any
+1^Appetizers
+2^Beverages
+3^Breads
+4^Breakfast
+5^Condiments
+6^Desserts
+7^Dinner
+8^Lunch
+9^Salads
+10^Side Dishes
+11^Snacks
+12^Soups

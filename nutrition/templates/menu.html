@@ -1,0 +1,36 @@
+{% comment %}
+  web_nutrition: a web based nutrition and diet analysis program.
+  Copyright (C) 2008 Edgar Denny
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% extends "base.html" %}
+
+{% block title %}Web Nutrition{% endblock %}
+
+{% block content %}
+  <h1>Welcome to Web Nutrition</h1>
+      <ul>
+        <li><a id="login" href="/accounts/login/?next=/menu/">Login</a></li>
+        <li><a id="register" href="/register/">New User</a></li>
+        <li><a id="set_rdi" href="/set_rdi/">Set Personal RDIs</a></li>
+        <li><a id="food_search" href="/food_search/">Food Search</a></li>
+        <li><a id="nutrient_search" href="/nutrient_search/">Nutrient Search</a></li>
+        <li><a id="create_recipe" href="/create_recipe/0/">Create Recipe</a></li>
+        <li><a id="search_recipe" href="/search_recipe/">Recipe Search</a></li>
+        <li><a id="edit_recipe" href="/search_edit_recipe/">Edit Recipe</a></li>
+        <li><a id="daily plan" href="/daily_plan/">Daily Plan</a></li>
+      </ul>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% comment %}
+  web_nutrition: a web based nutrition and diet analysis program.
+  Copyright (C) 2008 Edgar Denny
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% extends "base.html" %}
+
+{% block title %}Search Nutrient{% endblock %}</title>
+
+{% block content %}
+  <h1>Nutrient Search</h1>
+
+  <form action="." method="GET">
+    Search in Food Group : {{ form.food_group }}
+    <br />
+    <table border="1">
+      <tr><th>Nutrient</th><th>Factor</th>
+      <tr>
+        <td>{{ form.nutrient_1 }}
+          {% if errors.nutrient_1 %}<span class="errors">*</span>{% endif %}
+        </td>
+        <td>{{ form.factor_1 }}
+          {% if errors.factor_1 %}<span class="errors">*</span>{% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td>{{ form.nutrient_2 }}
+          {% if errors.nutrient_2 %}<span class="errors">*</span>{% endif %}
+        </td>
+        <td>{{ form.factor_2 }}
+          {% if errors.factor_2 %}<span class="errors">*</span>{% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td>{{ form.nutrient_3 }}
+          {% if errors.nutrient_3 %}<span class="errors">*</span>{% endif %}
+        </td>
+        <td>{{ form.factor_3 }}
+          {% if errors.factor_3 %}<span class="errors">*</span>{% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td>{{ form.nutrient_4 }}
+          {% if errors.nutrient_4 %}<span class="errors">*</span>{% endif %}
+        </td>
+        <td>{{ form.factor_4 }}
+          {% if errors.factor_4 %}<span class="errors">*</span>{% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td>{{ form.nutrient_5 }}
+          {% if errors.nutrient_5 %}<span class="errors">*</span>{% endif %}
+        </td>
+        <td>{{ form.factor_5 }}
+          {% if errors.factor_5 %}<span class="errors">*</span>{% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td>{{ form.nutrient_6 }}
+          {% if errors.nutrient_6 %}<span class="errors">*</span>{% endif %}
+        </td>
+        <td>{{ form.factor_6 }}
+          {% if errors.factor_6 %}<span class="errors">*</span>{% endif %}
+        </td>
+      </tr>
+    </table>
+    <br />
+    <input type="submit" name="search" value="Search" />
+  </form>
+{% endblock %}

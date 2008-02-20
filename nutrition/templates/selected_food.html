@@ -1,0 +1,88 @@
+{% comment %}
+  web_nutrition: a web based nutrition and diet analysis program.
+  Copyright (C) 2008 Edgar Denny
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% extends "base.html" %}
+
+{% block title %}Selected Food{% endblock %}</title>
+
+{% block content %}
+  <h1>Selected Food</h1>
+
+  {% if name %}
+    <h2>Nutrient Data for :  "{{ name|escape }}":</h2>
+
+  <form action="." method="GET">
+    {{ form.amount.label_tag }}
+    {{ form.amount}} {% if form.amount.errors %}<span class="errors">*</span>{% endif %}
+    {{ form.measure.label_tag }}
+    {{ form.measure}}
+    <input type="submit" value="Calculate">
+  </form>
+
+    <h3>Macro Nutrients</h3>
+    <table border="1">
+      {% for n in nutrients.general %}
+         <tr>
+           <td>{{ n.nutr_desc|escape }}</td>
+           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
+           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
+         </tr>
+      {% endfor %}
+    </table>
+    <h3>Vitamins</h3>
+    <table border="1">
+      {% for n in nutrients.vitamins %}
+         <tr>
+           <td>{{ n.nutr_desc|escape }}</td>
+           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
+           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
+         </tr>
+      {% endfor %}
+    </table>
+    <h3>Minerals</h3>
+    <table border="1">
+      {% for n in nutrients.minerals %}
+         <tr>
+           <td>{{ n.nutr_desc|escape }}</td>
+           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
+           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
+         <tr>
+      {% endfor %}
+    </table>
+    <h3>Amino Acids</h3>
+    <table border="1">
+      {% for n in nutrients.amino_acids %}
+         <tr>
+           <td>{{ n.nutr_desc|escape }}</td>
+           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
+           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
+         </tr>
+      {% endfor %}
+    </table>
+    <h3>Fats</h3>
+    <table border="1">
+      {% for n in nutrients.fats %}
+         <tr>
+           <td>{{ n.nutr_desc|escape }}</td>
+           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
+           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
+         </tr>
+      {% endfor %}
+    </table>
+  {% endif %}
+{% endblock %}

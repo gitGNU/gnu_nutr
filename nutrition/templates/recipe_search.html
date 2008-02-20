@@ -1,0 +1,46 @@
+{% comment %}
+  web_nutrition: a web based nutrition and diet analysis program.
+  Copyright (C) 2008 Edgar Denny
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% extends "base.html" %}
+
+{% block title %}Recipe Search{% endblock %}</title>
+
+{% block content %}
+  <h1>Search</h1>
+  <form action="." method="GET">
+    {{ form.text|escape }}
+    {% if not first_show %}
+        {% if form.text.errors %}<span class="errors">*</span>{% endif %}
+    {% endif %}
+    {{ form.category|escape }}
+    <input type="submit" value="Search">
+  </form>
+
+  {% if text %}
+    <h2>Results for "{{ text|escape }}":</h2>
+    {% if recipes %}
+      <ul>
+        {% for recipe in recipes %}
+          <li><a id="odd" href="recipe_id/{{ recipe.id|stringformat:"d" }}">{{ recipe.name }}</a></li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No Recipes Found</p>
+    {% endif %}
+  {% endif %}
+{% endblock %}

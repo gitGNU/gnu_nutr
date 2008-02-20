@@ -1,0 +1,54 @@
+{% comment %}
+  web_nutrition: a web based nutrition and diet analysis program.
+  Copyright (C) 2008 Edgar Denny
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% extends "base.html" %}
+
+{% block title %}Search Nutrient Result{% endblock %}</title>
+
+{% block content %}
+  <h1>Nutrient Search Result</h1>
+
+  <table border="1">
+    <tr>
+      <th>Food</th>
+      <th>Score</th>
+      {% for name in nutr_name.names %}
+        <th>
+          {{ name|escape }}
+        </th>
+      {% endfor %}
+    </tr>
+    {% for s in scores %}
+    <tr>
+      <td>
+        <a id="score" href="food_id/{{ s.food_id|escape }}">{{ s.name|escape }}</a>
+      </td>
+      <td>
+        {{ s.score|stringformat:".1f" }}
+      </td>
+      {% for v in s.values_list %}
+        <td>
+          {{ v.value|stringformat:".3f" }}
+        </td>
+        <td>
+          {{ v.percent_rdi|stringformat:".1f"}}
+        </td>
+      {% endfor %}
+    {% endfor %}
+  </table>
+{% endblock %}
