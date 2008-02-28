@@ -53,21 +53,37 @@
   </table>
 
   <h1>Daily Plan : {{ cal.year }}/{{ cal.month }}/{{ cal.day }}</h1>
-  <form action="." method="POST">
+  <form action="/daily_plan/{{ cal.year }}/{{ cal.month }}/{{ cal.day }}/" method="POST">
     <input type="submit" name="add_recipe" value="Add Recipe">
     <input type="submit" name="add_food" value="Add Food">
     <input type="submit" name="delete" value="Delete">
     <input type="submit" name="save" value="Save">
     <input type="submit" name="refresh" value="Refresh">
+    <br />
+    <table border="1">
+      <tr>
+        <th></th>
+        <th>Number</th>
+        <th>Food Measure</th>
+        <th>Name</th>
+      </tr>
+      {% for item in plan_list %}
+        <tr>
+          <td>{{ item.check|escape }}
+            {% if item.check.errors %}<span class="errors">*</span>{% endif %}
+          </td>
+          <td>{{ item.num_measures|escape }}
+            {% if item.num_measures.errors %}<span class="errors">*</span>{% endif %}
+          </td>
+          <td>{{ item.measure|escape }}
+            {% if item.measure.errors %}<span class="errors">*</span>{% endif %}
+          </td>
+          <td>{{ item.name|escape }}
+            {% if item.name.errors %}<span class="errors">*</span>{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
   </form>
-  <br />
-  <table border="1">
-    <tr>
-      <th></th>
-      <th>Number</th>
-      <th>Food Measure</th>
-      <th>Name</th>
-    </tr>
-  </table>
 
 {% endblock %}

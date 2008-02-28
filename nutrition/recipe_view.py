@@ -170,6 +170,9 @@ def all_is_valid(recipe, ingredient_list):
 
 @login_required
 def create_recipe(request, food_id=None, recipe_id=None):
+    if 'recipe_data' in request.session:
+        print 'before: recipe_data = ', request.session['recipe_data']
+        print 'before: session = ', request.session
     save_result = 2
     if recipe_id:
         recipe, ingredient_list, ingredient_order = load_recipe_from_id(recipe_id)
@@ -207,6 +210,9 @@ def create_recipe(request, food_id=None, recipe_id=None):
         recipe, ingredient_list, ingredient_order = load_recipe_from_session(request.session)
 
     nutrients = get_recipe_nutrient_data(request.user, recipe, ingredient_list, ingredient_order)
+
+    if 'recipe_data' in request.session:
+        print 'after: recipe_data = ', request.session['recipe_data']
 
     return render_to_response( 'create_recipe.html', {
             "recipe": recipe,

@@ -302,6 +302,9 @@ def get_recipes_matching_owned_by_user(user, text, id):
 def get_recipe(id):
     return Recipe.objects.filter(id=id).get()
 
+def get_recipe_name(id):
+    return Recipe.objects.filter(id=id).get().name
+
 # ------------------------------------------------------------
 
 class Ingredient(models.Model):

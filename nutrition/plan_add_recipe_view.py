@@ -21,8 +21,36 @@ from django import newforms as forms
 
 from models import *
 
+class RecipeSearchForm(forms.Form):
+    text = forms.CharField(max_length=60)
+    category = forms.ChoiceField()
+
+    def __init__(self, *args, **kwargs):
+        super(RecipeSearchForm, self).__init__(*args, **kwargs)
+        self.fields['category'].choices = [(c.id, c.name) for c in get_recipe_categories()]
+
+
 @login_required
 def plan_add_recipe(request):
+    data = request.GET.copy()
+    base_path = request.get_full_path().rsplit('/',2)[0]
+    if data.has_key('text'):
+        first_render = False
+    else:
+        first_render = True
+    form = RecipeSearchForm(request.GET)
+    if form.is_valid():
+        text = form.cleaned_data['text']
+        category = int(form.cleaned_data['category'])
+        recipes = get_recipes_matching(text, category)
+    else:
+        recipes = []
+        text = ''
 
     return render_to_response( 'plan_add_recipe.html', {
+            "form": form,
+            "first_render": first_render,
+            "text": text,
+            "base_path": base_path,
+            "recipes": recipes
             })
