@@ -18,6 +18,7 @@ from django.db import models
 from constants import *
 from django.contrib.auth.models import *
 from django.db import transaction, connection
+import datetime
 
 class Food_Group(models.Model):
     group_id = models.PositiveIntegerField(primary_key=True)
@@ -87,6 +88,23 @@ class Nutrient_Data(models.Model):
     class Admin:
         pass
 
+def get_calories(food_id, selected_measure_id, num_measures):
+    value = Nutrient_Data.objects.filter(food_id=food_id).filter(nutrient__nutrient_id=208).get().value
+    grams = Measure.objects.filter(food_id=food_id).filter(id=selected_measure_id).get().grams
+    calories = value * num_measures * grams / 100.0
+    return calories
+
+def get_ingredient_calories(ingredient_form, food_id):
+    food_id = int(food_id)
+    if ingredient_form.is_valid():
+        ingredient_form_data = ingredient_form.cleaned_data
+        print 'ingredient_form_data = ', ingredient_form_data
+        num_measures = float(ingredient_form_data['num_measures'])
+        measure = int(ingredient_form_data['measure'])
+        return get_calories(food_id, measure, num_measures)
+    else:
+        return 0.0
+
 # ------------------------------------------------------------
 
 class Measure(models.Model):
@@ -110,7 +128,8 @@ def get_measures(food_id):
 # ------------------------------------------------------------
 
 class Nutrient:
-    def __init__(self, desc, value, unit, percent):
+    def __init__(self, id, desc, value, unit, percent):
+        self.nutr_id = id
         self.nutr_desc = desc
         self.nutr_value = value
         self.unit_of_measure = unit
@@ -135,34 +154,39 @@ def populate_nutrient_values(nutr_dict, rdi_dict):
     nutrient = Nutrient_Container()
     nutrient.general = []
     for nutr_id, unit_of_measure, nutr_desc in tracked_nutrient.general:
-        nutrient.general.append(Nutrient(nutr_desc,
+        nutrient.general.append(Nutrient(nutr_id,
+                                         nutr_desc,
                                          nutr_dict[nutr_id],
                                          unit_of_measure,
                                          percent_rdi(nutr_id, nutr_dict, rdi_dict)))
     nutrient.vitamins = []
     for nutr_id, unit_of_measure, nutr_desc in tracked_nutrient.vitamins:
-        nutrient.vitamins.append(Nutrient(nutr_desc,
+        nutrient.vitamins.append(Nutrient(nutr_id,
+                                          nutr_desc,
                                           nutr_dict[nutr_id],
                                           unit_of_measure,
                                           percent_rdi(nutr_id, nutr_dict, rdi_dict)))
     nutrient.minerals = []
     for nutr_id, unit_of_measure, nutr_desc in tracked_nutrient.minerals:
-        nutrient.minerals.append(Nutrient(nutr_desc,
+        nutrient.minerals.append(Nutrient(nutr_id,
+                                          nutr_desc,
                                           nutr_dict[nutr_id],
                                           unit_of_measure,
                                           percent_rdi(nutr_id, nutr_dict, rdi_dict)))
     nutrient.amino_acids = []
     for nutr_id, unit_of_measure, nutr_desc in tracked_nutrient.amino_acids:
-        nutrient.amino_acids.append(Nutrient(nutr_desc,
+        nutrient.amino_acids.append(Nutrient(nutr_id,
+                                             nutr_desc,
                                              nutr_dict[nutr_id],
                                              unit_of_measure,
                                              percent_rdi(nutr_id, nutr_dict, rdi_dict)))
     nutrient.fats = []
     for nutr_id, unit_of_measure, nutr_desc in tracked_nutrient.fats:
-        nutrient.fats.append(Nutrient(nutr_desc,
-                                       nutr_dict[nutr_id],
-                                       unit_of_measure,
-                                       percent_rdi(nutr_id, nutr_dict, rdi_dict)))
+        nutrient.fats.append(Nutrient(nutr_id,
+                                      nutr_desc,
+                                      nutr_dict[nutr_id],
+                                      unit_of_measure,
+                                      percent_rdi(nutr_id, nutr_dict, rdi_dict)))
     return nutrient
 
 def get_food_nutrient_data(food_id, amount, selected_measure_id, user):
@@ -186,38 +210,99 @@ def get_food_nutrient_data(food_id, amount, selected_measure_id, user):
     return nutrients
 
 
-def get_recipe_database_data(ingredient_order):
-    all_food_data = list(Nutrient_Data.objects.filter(food_id__in=ingredient_order))
-    all_measures = list(Measure.objects.filter(food_id__in=ingredient_order))
+def get_food_database_data(food_id_list):
+    all_food_data = list(Nutrient_Data.objects.filter(food_id__in=food_id_list))
+    all_measures = list(Measure.objects.filter(food_id__in=food_id_list))
     return all_food_data, all_measures
 
-def get_recipe_food_data(num, ingredient_order, ingredient_list, all_food_data, all_measures):
-    ingredient = ingredient_list[num]
-    num_measures = float (ingredient['num_measures'])
+def get_recipe_database_data(recipe_order):
+    all_recipe_data = list(Recipe_Nutrient_Data.objects.filter(recipe__id__in=recipe_order))
+    return all_recipe_data
 
-    food_id = int(ingredient_order[num])
+def get_recipe_food_data(food_id, ingredient_form_data, all_food_data, all_measures):
+    food_id = int(food_id)
+    num_measures = float(ingredient_form_data['num_measures'])
     food_data = [(elm.nutrient_id, elm.value) for elm in all_food_data if elm.food_id == food_id]
-
-    measure = int(ingredient['measure'])
+    measure = int(ingredient_form_data['measure'])
     for elm in all_measures:
         if elm.id == measure:
             grams = elm.grams
             break
     return food_data, num_measures, grams
 
-def calculate_recipe_nutrient_total(ingredient_list, ingredient_order, num_servings):
+def get_plan_food_data(food_id, food_form, all_food_data, all_measures):
+    food_id = int(food_id)
+    num_measures = float(food_form['num_measures'])
+    food_data = [(elm.nutrient_id, elm.value) for elm in all_food_data if elm.food_id == food_id]
+    measure = int(food_form['measure'])
+    for elm in all_measures:
+        if elm.id == measure:
+            grams = elm.grams
+            break
+    return food_data, num_measures, grams
+
+def get_plan_recipe_data(recipe_id, recipe_form, all_recipe_data):
+    recipe_id = int(recipe_id)
+    num_measures = float(recipe_form['num_measures'])
+    recipe_data = [(elm.nutrient_id, elm.value) for elm in all_recipe_data \
+                       if elm.recipe_id == recipe_id]
+    return recipe_data, num_measures
+
+def calculate_recipe_nutrient_total(ingredient_form_data_list, food_id_list, num_servings):
+    nutr_dict = {}
+    calorie_list = []
+    for id in food_id_list:
+        calorie_list.append(0.0)
+    for id in all_nutrient_ids:
+        nutr_dict[id] = 0.0
+    all_food_data, all_measures = get_food_database_data(food_id_list)
+    for i in range(0, len(food_id_list)):
+        food_data, num_measures, grams = \
+            get_recipe_food_data(food_id_list[i], ingredient_form_data_list[i],
+                                 all_food_data, all_measures)
+        for nutrient_id, value in food_data:
+            nutr_val = value * num_measures * grams / (100.0 * float(num_servings))
+            nutr_dict[nutrient_id] += nutr_val
+            if nutrient_id == 208:
+                calorie_list[i] = nutr_val
+    return nutr_dict, calorie_list
+
+def calculate_plan_nutrient_total(plan_form_list, plan_order):
     nutr_dict = {}
     for id in all_nutrient_ids:
         nutr_dict[id] = 0.0
-    all_food_data, all_measures = get_recipe_database_data(ingredient_order)
-    for num in range(0, len(ingredient_order)):
-        food_data, num_measures, grams = get_recipe_food_data(num,
-                                                              ingredient_order,
-                                                              ingredient_list,
-                                                              all_food_data,
-                                                              all_measures)
+
+    food_list = []
+    food_form_list = []
+    recipe_list = []
+    recipe_form_list = []
+
+    for i in range(0, len(plan_order)):
+        type, id = plan_order[i]
+        if type == 'food':
+            food_list.append(id)
+            food_form_list.append(plan_form_list[i])
+        if type == 'recipe':
+            recipe_list.append(id)
+            recipe_form_list.append(plan_form_list[i])
+
+    all_food_data, all_measures = get_food_database_data(food_list)
+    all_recipe_data = get_recipe_database_data(recipe_list)
+
+    for i in range(0, len(food_list)):
+        food_data, num_measures, grams = get_plan_food_data(food_list[i],
+                                                            food_form_list[i],
+                                                            all_food_data,
+                                                            all_measures)
         for nutrient_id, value in food_data:
-            nutr_dict[nutrient_id] += value * num_measures * grams / (100.0 * float(num_servings))
+            nutr_dict[nutrient_id] += value * num_measures * grams / 100.0
+
+    for i in range(0, len(recipe_list)):
+        recipe_data, num_measures = get_plan_recipe_data(recipe_list[i],
+                                                         recipe_form_list[i],
+                                                         all_recipe_data)
+        for nutrient_id, value in recipe_data:
+            nutr_dict[nutrient_id] += value * num_measures
     return nutr_dict
 
 def set_user_rdis_dict(user):
@@ -227,11 +312,25 @@ def set_user_rdis_dict(user):
         rdi_dict[item.nutrient_id] = item.min_nutrient_value
     return rdi_dict
 
-def calculate_recipe_nutrient_data(user, ingredient_list, ingredient_order, num_servings):
+def calculate_plan_nutrient_data(user, plan_form_list, plan_order):
     rdi_dict = set_user_rdis_dict(user)
-    nutr_dict = calculate_recipe_nutrient_total(ingredient_list, ingredient_order, num_servings)
+    nutr_dict = calculate_plan_nutrient_total(plan_form_list, plan_order)
     nutrients = populate_nutrient_values(nutr_dict, rdi_dict)
     return nutrients
+
+def calculate_recipe_nutrient_data(user, ingredient_form_list, num_servings):
+    rdi_dict = set_user_rdis_dict(user)
+    ingredient_form_data_list = []
+    food_id_list = []
+    for i in range(0, len(ingredient_form_list)):
+        ingredient_form_data = ingredient_form_list[i].cleaned_data
+        food_id = ingredient_form_data['food_id']
+        food_id_list.append(food_id)
+        ingredient_form_data_list.append(ingredient_form_data)
+    nutr_dict, calorie_list = calculate_recipe_nutrient_total(ingredient_form_data_list,
+                                                             food_id_list, num_servings)
+    nutrients = populate_nutrient_values(nutr_dict, rdi_dict)
+    return nutrients, calorie_list
 
 class RDI_Data:
     def __init__(self, id, desc, min_value, max_value, unit):
@@ -332,6 +431,11 @@ class Recipe_Nutrient_Data(models.Model):
     nutrient = models.ForeignKey(Nutrient_Definition, to_field='nutrient_id')
     value = models.FloatField()
 
+    def __unicode__(self):
+        return u'%d, %d, %s, %s, %f' % (self.recipe.id, self.nutrient.nutrient_id,
+                                        self.nutrient.unit_of_measure,
+                                        self.nutrient.name, self.value)
+
 def get_recipe_nutrient_data(id):
     return Recipe_Nutrient_Data.objects.filter(recipe__id=id)
 
@@ -342,28 +446,32 @@ def get_recipe_nutrient_data(id):
 #     preparation_desc = models.TextField()
 
 @transaction.commit_on_success
-def save_recipe_to_database(user, recipe_form, ingredient_form_list, ingredient_order):
-    recipe_data = recipe_form.cleaned_data
-    old_recipes = Recipe.objects.filter(user=user).filter(name=recipe_data['name'])
+def save_recipe_to_database(user, recipe_form, ingredient_form_list):
+    recipe_form_data = recipe_form.cleaned_data
+    old_recipes = Recipe.objects.filter(user=user).filter(name=recipe_form_data['name'])
     for o in old_recipes:
         Ingredient.objects.filter(recipe__id=o.id).delete()
         Recipe_Nutrient_Data.objects.filter(recipe__id=o.id).delete()
         o.delete()
-    num_servings = recipe_data['num_servings']
-    r = Recipe(user=user, name=recipe_data['name'], category_id=recipe_data['category'],
+    num_servings = recipe_form_data['num_servings']
+    r = Recipe(user=user, name=recipe_form_data['name'], category_id=recipe_form_data['category'],
                number_servings=num_servings)
     r.save()
-    ingredient_data_list = []
+    ingredient_form_data_list = []
+    food_id_list = []
     for i in range(0, len(ingredient_form_list)):
-        ingredient_data = ingredient_form_list[i].cleaned_data
-        food_id = ingredient_order[i]
-        ingredient_data_list.append(ingredient_data)
-        ing = Ingredient(order=i, measure_id=ingredient_data['measure'],
+        ingredient_form_data = ingredient_form_list[i].cleaned_data
+        food_id = ingredient_form_data['food_id']
+        food_id_list.append(food_id)
+        ingredient_form_data_list.append(ingredient_form_data)
+        ing = Ingredient(order=i, measure_id=ingredient_form_data['measure'],
                          food_id=food_id,
-                         number_measures=ingredient_data['num_measures'],
+                         number_measures=ingredient_form_data['num_measures'],
                          recipe_id=r.id)
         ing.save()
-    nutr_dict = calculate_recipe_nutrient_total(ingredient_data_list, ingredient_order, num_servings)
+    nutr_dict, calorie_list = calculate_recipe_nutrient_total(ingredient_form_data_list,
+                                                              food_id_list,
+                                                              num_servings)
     for key, val in nutr_dict.items():
         d = Recipe_Nutrient_Data(recipe_id = r.id, nutrient_id=key, value=val)
         d.save()
@@ -522,3 +630,50 @@ def get_max_dict():
     for o in objs:
         dict[o.nutrient_id] = o.max
     return dict
+
+# -----------------------------------------------------------------
+
+class Plan(models.Model):
+    user = models.ForeignKey(User, to_field='id')
+    plan_date = models.DateField(db_index=True)
+    item_type = models.CharField(max_length=1)
+    item_id = models.PositiveIntegerField()
+    order = models.PositiveSmallIntegerField()
+    measure = models.PositiveIntegerField()
+    num_measures = models.FloatField()
+    name = models.CharField(max_length=200)
+
+    def get_year(self):
+        self.plan_date.strftime('%Y')
+
+    def get_month(self):
+        self.plan_date.strftime('%m')
+
+    def get_day(self):
+        self.plan_date.strftime('%d')
+
+@transaction.commit_on_success
+def save_plan_to_database(user, plan_form_list, plan_order, year, month, day):
+    plan_date = datetime.date(int(year), int(month), int(day))
+    old_plan = Plan.objects.filter(user=user).filter(plan_date=plan_date)
+    for o in old_plan:
+        o.delete()
+    for i in range(0, len(plan_form_list)):
+        plan_data = plan_form_list[i].cleaned_data
+        type, item_id = plan_order[i]
+        if type == 'food':
+            item_type = 'F'
+            measure = plan_data['measure'],
+        else:
+            item_type = 'R'
+            measure = 0
+        o = Plan(order=i, user=user, plan_date=plan_date, measure=measure,
+                 item_id=item_id, item_type=item_type,
+                 num_measures=plan_data['num_measures'],
+                 name=plan_data['name'])
+        o.save()
+
+def get_user_plan(user, year, month, day):
+    plan_date = datetime.date(int(year), int(month), int(day))
+    plan_list = Plan.objects.filter(user=user).filter(plan_date=plan_date).order_by('order')
+    return plan_list

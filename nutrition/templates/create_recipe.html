@@ -39,8 +39,11 @@
         <th>Number</th>
         <th>Measure</th>
         <th>Food</th>
+        <th>Calories (Per Serving)</th>
       </tr>
     {% for ingredient in ingredient_list %}
+      {{ ingredient.food_id }}
+      {{ ingredient.name }}
       <tr>
         <td>{{ ingredient.check|escape }}
           {% if ingredient.check.errors %}<span class="errors">*</span>{% endif %}
@@ -51,9 +54,8 @@
         <td>{{ ingredient.measure|escape }}
           {% if ingredient.measure.errors %}<span class="errors">*</span>{% endif %}
         </td>
-        <td>{{ ingredient.name|escape }}
-          {% if ingredient.name.errors %}<span class="errors">*</span>{% endif %}
-        </td>
+        <td><a id="odd" href="/food_search/food_id/{{ ingredient.id }}/measure/{{ ingredient.measure_str }}/amount/{{ ingredient.amount }}">{{ ingredient.name_str }}</a></td>
+        <td> {{ ingredient.calories|stringformat:".2f" }}</td>
       </tr>
     {% endfor %}
     </table>
@@ -73,8 +75,8 @@
     <table border="1">
       {% for n in nutrients.general %}
          <tr>
-           <td>{{ n.nutr_desc|escape }}</td>
-           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
+           <td>{{ n.nutr_desc }}</td>
+           <td>{{ n.nutr_value|stringformat:".2f" }} {{ n.unit_of_measure }}</td>
            <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
          </tr>
       {% endfor %}
@@ -83,8 +85,8 @@
     <table border="1">
       {% for n in nutrients.vitamins %}
          <tr>
-           <td>{{ n.nutr_desc|escape }}</td>
-           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
+           <td>{{ n.nutr_desc }}</td>
+           <td>{{ n.nutr_value|stringformat:".2f" }} {{ n.unit_of_measure }}</td>
            <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
          </tr>
       {% endfor %}
@@ -93,8 +95,8 @@
     <table border="1">
       {% for n in nutrients.minerals %}
          <tr>
-           <td>{{ n.nutr_desc|escape }}</td>
-           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
+           <td>{{ n.nutr_desc }}</td>
+           <td>{{ n.nutr_value|stringformat:".2f" }} {{ n.unit_of_measure }}</td>
            <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
          <tr>
       {% endfor %}
@@ -103,8 +105,8 @@
     <table border="1">
       {% for n in nutrients.amino_acids %}
          <tr>
-           <td>{{ n.nutr_desc|escape }}</td>
-           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
+           <td>{{ n.nutr_desc }}</td>
+           <td>{{ n.nutr_value|stringformat:".2f" }} {{ n.unit_of_measure }}</td>
            <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
          </tr>
       {% endfor %}
@@ -113,8 +115,8 @@
     <table border="1">
       {% for n in nutrients.fats %}
          <tr>
-           <td>{{ n.nutr_desc|escape }}</td>
-           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
+           <td>{{ n.nutr_desc }}</td>
+           <td>{{ n.nutr_value|stringformat:".2f" }} {{ n.unit_of_measure }}</td>
            <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
          </tr>
       {% endfor %}

@@ -54,6 +54,9 @@
 
   <h1>Daily Plan : {{ cal.year }}/{{ cal.month }}/{{ cal.day }}</h1>
   <form action="/daily_plan/{{ cal.year }}/{{ cal.month }}/{{ cal.day }}/" method="POST">
+    {% ifequal save_result 0 %}
+      <p>Cannot Save: correct entries highlighted with '*'</p>
+    {% endifequal %}
     <input type="submit" name="add_recipe" value="Add Recipe">
     <input type="submit" name="add_food" value="Add Food">
     <input type="submit" name="delete" value="Delete">
@@ -85,5 +88,58 @@
       {% endfor %}
     </table>
   </form>
+
+  {% if nutrients.general %}
+    <h3>Macro Nutrients</h3>
+    <table border="1">
+      {% for n in nutrients.general %}
+         <tr>
+           <td>{{ n.nutr_desc|escape }}</td>
+           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
+           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
+         </tr>
+      {% endfor %}
+    </table>
+    <h3>Vitamins</h3>
+    <table border="1">
+      {% for n in nutrients.vitamins %}
+         <tr>
+           <td>{{ n.nutr_desc|escape }}</td>
+           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
+           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
+         </tr>
+      {% endfor %}
+    </table>
+    <h3>Minerals</h3>
+    <table border="1">
+      {% for n in nutrients.minerals %}
+         <tr>
+           <td>{{ n.nutr_desc|escape }}</td>
+           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
+           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
+         <tr>
+      {% endfor %}
+    </table>
+    <h3>Amino Acids</h3>
+    <table border="1">
+      {% for n in nutrients.amino_acids %}
+         <tr>
+           <td>{{ n.nutr_desc|escape }}</td>
+           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
+           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
+         </tr>
+      {% endfor %}
+    </table>
+    <h3>Fats</h3>
+    <table border="1">
+      {% for n in nutrients.fats %}
+         <tr>
+           <td>{{ n.nutr_desc|escape }}</td>
+           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
+           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
+         </tr>
+      {% endfor %}
+    </table>
+  {% endif %}
 
 {% endblock %}

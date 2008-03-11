@@ -40,6 +40,7 @@ urlpatterns = \
              (r'food_search/$', food_search),
              (r'create_recipe/$', create_recipe),
              (r'create_recipe/(?P<food_id>\d+)/$', create_recipe),
+             (r'food_search/food_id/(?P<food_id>\d+)/measure/(?P<measure>\d+)/amount/(?P<amount>(\b[0-9]{0,5}?\.[0-9]*\b|\b[0-9]{0,5}?\b|\.[0-9]*\b))$', selected_food),
              (r'add_ingredient/$', add_ingredient),
              (r'food_search/food_id/(?P<food_id>\d+)/$', selected_food),
              (r'search_recipe/recipe_id/(?P<recipe_id>\d+)/$', selected_recipe),
