@@ -1,3 +1,5 @@
+{% extends "base.html" %}
+
 {% comment %}
   web_nutrition: a web based nutrition and diet analysis program.
   Copyright (C) 2008 Edgar Denny
@@ -16,13 +18,10 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
-{% extends "base.html" %}
-
 {% block title %}Daily Plan{% endblock %}</title>
 
 {% block content %}
-
-  <h1>Calendar</h1>
+  <h1 class="title">Calendar</h1>
   <table border="1">
     <tr>
       <th colspan="3"><a id="year" href="/daily_plan/{{ cal.prev_year }}/{{ cal.month }}/1">prev year</a></th>
@@ -36,7 +35,7 @@
     </tr>
     <tr>
       {% for day_name in cal.day_names %}
-        <td>{{ day_name|escape }}</td>
+        <td>{{ day_name }}</td>
       {% endfor %}
     </tr>
     {% for week in cal.calendar_rows %}
@@ -57,11 +56,11 @@
     {% ifequal save_result 0 %}
       <p>Cannot Save: correct entries highlighted with '*'</p>
     {% endifequal %}
+    <input type="submit" name="refresh" value="Refresh">
     <input type="submit" name="add_recipe" value="Add Recipe">
     <input type="submit" name="add_food" value="Add Food">
     <input type="submit" name="delete" value="Delete">
     <input type="submit" name="save" value="Save">
-    <input type="submit" name="refresh" value="Refresh">
     <br />
     <table border="1">
       <tr>
@@ -69,6 +68,7 @@
         <th>Number</th>
         <th>Food Measure</th>
         <th>Name</th>
+        <th>Calories</th>
       </tr>
       {% for item in plan_list %}
         <tr>
@@ -78,11 +78,24 @@
           <td>{{ item.num_measures|escape }}
             {% if item.num_measures.errors %}<span class="errors">*</span>{% endif %}
           </td>
-          <td>{{ item.measure|escape }}
-            {% if item.measure.errors %}<span class="errors">*</span>{% endif %}
+          <td>
+            {% ifequal item.item_type "food" %}
+              {{ item.measure|escape }}
+              {% if item.measure.errors %}<span class="errors">*</span>{% endif %}
+            {% else %}
+              1 serving
+            {% endifequal %}
           </td>
-          <td>{{ item.name|escape }}
-            {% if item.name.errors %}<span class="errors">*</span>{% endif %}
+          <td>
+            {% ifequal item.item_type "food" %}
+              <a id="odd" href="/food_search/food_id/{{ item.item_id }}/measure/{{ item.measure_str }}/amount/{{ item.amount }}">{{ item.name_str }}</a>
+            {% else %}
+              <a id="odd" href="/search_recipe/recipe_id/{{ item.item_id }}">{{ item.name_str }}</a>
+            {% endifequal %}
+              {% if item.name.errors %}<span class="errors">*</span>{% endif %}
+          </td>
+          <td>
+            {{ item.calories }}
           </td>
         </tr>
       {% endfor %}
@@ -141,5 +154,4 @@
       {% endfor %}
     </table>
   {% endif %}
-
 {% endblock %}

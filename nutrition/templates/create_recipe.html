@@ -1,3 +1,5 @@
+{% extends "base.html" %}
+
 {% comment %}
   web_nutrition: a web based nutrition and diet analysis program.
   Copyright (C) 2008 Edgar Denny
@@ -15,8 +17,6 @@
   You should have received a copy of the GNU Affero General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
-
-{% extends "base.html" %}
 
 {% block title %}Create Recipe{% endblock %}</title>
 
@@ -64,10 +64,10 @@
     {% ifequal save_result 0 %}
       <p>Cannot Save: correct entries highlighted with '*'</p>
     {% endifequal %}
+    <input type="submit" name="refresh" value="Refresh">
     <input type="submit" name="add_ingredient" value="Add Ingredient">
     <input type="submit" name="delete_ingredient" value="Delete Ingredient">
     <input type="submit" name="save_recipe" value="Save Recipe">
-    <input type="submit" name="refresh" value="Refresh">
   </form>
 
   {% if nutrients.general %}

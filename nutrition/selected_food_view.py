@@ -43,6 +43,8 @@ def selected_food( request, food_id, measure=None, amount=None):
             if measure and amount:
                 form_data = {'amount': amount, 'measure': measure}
                 form = FoodSelectForm(form_data, measure_choices=measures_list)
+            else:
+                form = FoodSelectForm(measure_choices=measures_list)
     else:
         if measure and amount:
             form_data = {'amount': amount, 'measure': measure}
@@ -57,7 +59,9 @@ def selected_food( request, food_id, measure=None, amount=None):
         measure_data = measures_list[0].id
 
     nutrients = get_food_nutrient_data(int(food_id), amount_data, measure_data, request.user)
+
     return render_to_response( 'selected_food.html', {
             "name": name,
+            "food_id": food_id,
             "nutrients": nutrients,
             "form": form})

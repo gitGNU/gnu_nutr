@@ -140,11 +140,10 @@ def set_rdi(request):
             if all_is_valid(nutrients):
                 save_rdi_to_database(request.user, nutrients)
     else:
-        rdis = get_user_rdis(request.user.id)
-        nutrients = set_rdi_form_elements(rdis)
-
-    # default should be set with the creation of a new user.
-
+        rdi_list = get_user_rdis(request.user.id)
+        if not rdi_list:
+            rdi_list = get_default_rdi()
+        nutrients = set_rdi_form_elements(rdi_list)
 
     return render_to_response( 'set_rdi.html',{
             "nutrients":nutrients

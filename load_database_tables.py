@@ -50,8 +50,8 @@ def psql_drop_table(table_name):
     run_psql_command('DROP TABLE ' + table_name + ';')
 
 def psql_copy(input_file, table_name):
-    run_psql_command('COPY ' + table_name + ' FROM \'' + input_file +
-                      '\' WITH DELIMITER \'^\' NULL AS \'\'')
+    run_psql_command('\COPY ' + table_name + ' FROM \'' + input_file +
+                     '\' WITH DELIMITER \'^\' NULL AS \'\'')
 
 def load_food_group(file):
     f_in = open(file, 'r')

@@ -134,6 +134,10 @@ class Nutrient:
         self.nutr_value = value
         self.unit_of_measure = unit
         self.percent_rdi = percent
+        if percent > 100.0:
+            self.width = 100
+        else:
+            self.width = percent
 
 def value_or_zero(dict, key):
     if key in dict:
@@ -267,43 +271,49 @@ def calculate_recipe_nutrient_total(ingredient_form_data_list, food_id_list, num
                 calorie_list[i] = nutr_val
     return nutr_dict, calorie_list
 
-def calculate_plan_nutrient_total(plan_form_list, plan_order):
+def calculate_plan_nutrient_total(plan_form_data_list, plan_order):
     nutr_dict = {}
     for id in all_nutrient_ids:
         nutr_dict[id] = 0.0
 
+    calorie_dict = {}
     food_list = []
-    food_form_list = []
+    food_form_data_list = []
     recipe_list = []
-    recipe_form_list = []
+    recipe_form_data_list = []
 
     for i in range(0, len(plan_order)):
         type, id = plan_order[i]
         if type == 'food':
             food_list.append(id)
-            food_form_list.append(plan_form_list[i])
+            food_form_data_list.append(plan_form_data_list[i])
         if type == 'recipe':
             recipe_list.append(id)
-            recipe_form_list.append(plan_form_list[i])
-
+            recipe_form_data_list.append(plan_form_data_list[i])
     all_food_data, all_measures = get_food_database_data(food_list)
     all_recipe_data = get_recipe_database_data(recipe_list)
 
     for i in range(0, len(food_list)):
         food_data, num_measures, grams = get_plan_food_data(food_list[i],
-                                                            food_form_list[i],
+                                                            food_form_data_list[i],
                                                             all_food_data,
                                                             all_measures)
         for nutrient_id, value in food_data:
-            nutr_dict[nutrient_id] += value * num_measures * grams / 100.0
+            nutr_val = value * num_measures * grams / 100.0
+            nutr_dict[nutrient_id] += nutr_val
+            if nutrient_id == 208:
+                calorie_dict['%s_food' % food_list[i]] = nutr_val
 
     for i in range(0, len(recipe_list)):
         recipe_data, num_measures = get_plan_recipe_data(recipe_list[i],
-                                                         recipe_form_list[i],
+                                                         recipe_form_data_list[i],
                                                          all_recipe_data)
         for nutrient_id, value in recipe_data:
-            nutr_dict[nutrient_id] += value * num_measures
-    return nutr_dict
+            nutr_val = value * num_measures
+            nutr_dict[nutrient_id] += nutr_val
+            if nutrient_id == 208:
+                calorie_dict['%s_recipe' % recipe_list[i]] = nutr_val
+    return nutr_dict, calorie_dict
 
 def set_user_rdis_dict(user):
     rdi_dict = {}
@@ -312,11 +322,11 @@ def set_user_rdis_dict(user):
         rdi_dict[item.nutrient_id] = item.min_nutrient_value
     return rdi_dict
 
-def calculate_plan_nutrient_data(user, plan_form_list, plan_order):
+def calculate_plan_nutrient_data(user, plan_form_data_list, plan_order):
     rdi_dict = set_user_rdis_dict(user)
-    nutr_dict = calculate_plan_nutrient_total(plan_form_list, plan_order)
+    nutr_dict, calorie_dict = calculate_plan_nutrient_total(plan_form_data_list, plan_order)
     nutrients = populate_nutrient_values(nutr_dict, rdi_dict)
-    return nutrients
+    return nutrients, calorie_dict
 
 def calculate_recipe_nutrient_data(user, ingredient_form_list, num_servings):
     rdi_dict = set_user_rdis_dict(user)
@@ -333,31 +343,24 @@ def calculate_recipe_nutrient_data(user, ingredient_form_list, num_servings):
     return nutrients, calorie_list
 
 class RDI_Data:
-    def __init__(self, id, desc, min_value, max_value, unit):
-        self.nutr_id = id
-        self.nutr_desc = desc
-        self.min_nutr_value = min_value
-        self.max_nutr_value = max_value
-        self.unit_of_measure = unit
+    def __init__(self, nutrient_id, min_value, max_value):
+        self.nutrient_id = nutrient_id
+        self.min_nutrient_value = min_value
+        self.max_nutrient_value = max_value
 
 def get_default_rdi():
-    nutrient = Nutrient_Container()
-    nutrient.general = []
-    for id, unit, desc, min, max in rdi_default.general:
-        nutrient.general.append(RDI_Data(id, desc, min, max, unit))
-    nutrient.minerals = []
-    for id, unit, desc, min, max in rdi_default.minerals:
-        nutrient.minerals.append(RDI_Data(id, desc, min, max, unit))
-    nutrient.vitamins = []
-    for id, unit, desc, min, max in rdi_default.vitamins:
-        nmutrient.vitamins.append(RDI_Data(id, desc, min, max, unit))
-    mutrient.amino_acids = []
-    for id, unit, desc, min, max in rdi_default.amino_acids:
-        nutrient.amino_acids.append(RDI_Data(id, desc, min, max, unit))
-    nutrient.fats = []
-    for id, unit, desc, min, max in rdi_default.fats:
-        nutrient.fats.append(RDI_Data(id, desc, min, max, unit))
-    return nutrient
+    rdi_list = []
+    for nutr_id, unit, desc, min_val, max_val in rdi_default.general:
+        rdi_list.append(RDI_Data(nutr_id, min_val, max_val))
+    for nutr_id, unit, desc, min_val, max_val in rdi_default.minerals:
+        rdi_list.append(RDI_Data(nutr_id, min_val, max_val))
+    for nutr_id, unit, desc, min_val, max_val in rdi_default.vitamins:
+        rdi_list.append(RDI_Data(nutr_id, min_val, max_val))
+    for nutr_id, unit, desc, min_val, max_val in rdi_default.amino_acids:
+        rdi_list.append(RDI_Data(nutr_id, min_val, max_val))
+    for nutr_id, unit, desc, min_val, max_val in rdi_default.fats:
+        rdi_list.append(RDI_Data(nutr_id, min_val, max_val))
+    return rdi_list
 
 # ------------------------------------------------------------
 
@@ -663,14 +666,16 @@ def save_plan_to_database(user, plan_form_list, plan_order, year, month, day):
         type, item_id = plan_order[i]
         if type == 'food':
             item_type = 'F'
-            measure = plan_data['measure'],
+            measure = plan_data['measure']
+            name = food_id_2_name(item_id)
         else:
             item_type = 'R'
             measure = 0
+            name = get_recipe_name(item_id)
         o = Plan(order=i, user=user, plan_date=plan_date, measure=measure,
                  item_id=item_id, item_type=item_type,
                  num_measures=plan_data['num_measures'],
-                 name=plan_data['name'])
+                 name=name)
         o.save()
 
 def get_user_plan(user, year, month, day):

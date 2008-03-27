@@ -20,9 +20,41 @@
 <html lang="en">
 <head>
     <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="/site_media/styles/base.css" />
+    <script type="text/javascript" src="/site_media/javascript/jquery-1.2.3.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+
+      });
+    </script>
 </head>
+
 <body>
-    {% block content %}
-    {% endblock %}
+  <div id="container">
+    <div id="header">
+      <h1>Web Nutrition</h1>
+    </div>
+    <div id="leftnav">
+      <h4>Navigation</h4>
+      <ul>
+        <li><a id="login" href="/accounts/login/?next=/menu/">Login</a></li>
+        <li><a id="register" href="/register/">New User</a></li>
+        <li><a id="set_rdi" href="/set_rdi/">Set Personal RDIs</a></li>
+        <li><a id="food_search" href="/food_search/">Food Search</a></li>
+        <li><a id="nutrient_search" href="/nutrient_search/">Nutrient Search</a></li>
+        <li><a id="create_recipe" href="/create_recipe/0/">Create Recipe</a></li>
+        <li><a id="search_recipe" href="/search_recipe/">Recipe Search</a></li>
+        <li><a id="edit_recipe" href="/search_edit_recipe/">Edit Recipe</a></li>
+        <li><a id="daily plan" href="/daily_plan/">Daily Plan</a></li>
+      </ul>
+    </div>
+    <div id="content">
+      {% block content %}
+      {% endblock %}
+    </div>
+    <div id="footer">
+      <h5>Edgar Denny</h5>
+    </div>
+  </div>
 </body>
 </html>

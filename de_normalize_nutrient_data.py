@@ -83,19 +83,19 @@ def run():
 #         conn.commit()
 #     except:
 #         pass
-    try:
-        curs.execute('drop table temp')
-        conn.commit()
-    except:
-        pass
+#     try:
+#         curs.execute('drop table temp')
+#         conn.commit()
+#     except:
+#         pass
 
     # python seems to complain about this, but I can run it fine from within psql.
 
-    # create table of nutrient data per 200 calories, rather than per 100 g
-#    curs.execute("create table nutrition_per_200 as select a.food_id, a.nutrient_id, 200.0*(a.value/b.value) as val_per_200 from nutrition_nutrient_data a, nutrition_nutrient_data b where a.food_id = b.food_id and b.nutrient_id='208' and b.value <> 0;")
-    conn.commit()
-    curs.execute("create table temp as select distinct food_id from nutrition_per_200")
-    conn.commit()
+#    create table of nutrient data per 200 calories, rather than per 100 g
+ #    curs.execute("create table nutrition_per_200 as select a.food_id, a.nutrient_id, 200.0*(a.value/b.value) as val_per_200 from nutrition_nutrient_data a, nutrition_nutrient_data b where a.food_id = b.food_id and b.nutrient_id = '208' and b.value <> '0'")
+#     conn.commit()
+#     curs.execute('create table temp as select distinct food_id from nutrition_per_200')
+#     conn.commit()
     curs.execute('select food_id from temp')
     result = curs.fetchall()
     # create table of de-normalized data
@@ -185,5 +185,5 @@ def run():
     conn.commit()
 
 if __name__== "__main__":
-#    run()
+    run()
     insert_table_max_avg_per_200()

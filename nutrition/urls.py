@@ -15,6 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.conf.urls.defaults import *
+from django.conf import settings
+
 from nutr.nutrition.selected_food_view import selected_food
 from nutr.nutrition.food_search_view import food_search
 from nutr.nutrition.menu_view import menu
@@ -30,6 +32,7 @@ from nutr.nutrition.selected_recipe_view import selected_recipe
 from nutr.nutrition.set_rdi_view import set_rdi
 from nutr.nutrition.register import register
 from django.contrib.auth.views import login, logout
+
 
 urlpatterns = \
     patterns('',
@@ -57,3 +60,8 @@ urlpatterns = \
              (r'daily_plan/\d{4}/\d{1,2}/\d{1,2}/add_food/$', plan_add_food),
              (r'daily_plan/\d{4}/\d{1,2}/\d{1,2}/add_recipe/$', plan_add_recipe),
              (r'daily_plan/$', daily_plan))
+
+if settings.DEBUG:
+    urlpatterns += patterns('',
+        (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
+    )

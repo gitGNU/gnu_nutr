@@ -1,3 +1,5 @@
+{% extends "base.html" %}
+
 {% comment %}
   web_nutrition: a web based nutrition and diet analysis program.
   Copyright (C) 2008 Edgar Denny
@@ -16,73 +18,135 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
-{% extends "base.html" %}
-
 {% block title %}Selected Food{% endblock %}</title>
 
 {% block content %}
+
+<script type="text/javascript">
+   // When the page is ready
+   $(document).ready(function(){
+     $("#tabs div").each(function(){
+           $(this).hide();
+     });
+     $("#tabs div:first").show();
+     $("#nav a:first").addClass("activetab");
+     $("#nav a").click(function(){
+       var AttrTitle = $(this).attr("title");
+       $("#nav a").each(function(){
+           if ( $(this).hasClass("activetab") )
+             $(this).removeClass("activetab");
+       });
+       $(this).addClass("activetab");
+       $("#tabs div").each(function(){
+         var AttrId = $(this).attr("id");
+         if (AttrTitle == AttrId) {
+           $(this).show();
+         } else {
+           $(this).hide();
+         }
+       });
+     });
+   });
+</script>
+
   <h1>Selected Food</h1>
 
   {% if name %}
     <h2>Nutrient Data for :  "{{ name|escape }}":</h2>
 
-  <form action="." method="GET">
+  <form action="/food_search/food_id/{{ food_id }}" method="GET">
     {{ form.amount.label_tag }}
     {{ form.amount}} {% if form.amount.errors %}<span class="errors">*</span>{% endif %}
     {{ form.measure.label_tag }}
-    {{ form.measure}}
+    {{ form.measure }}
     <input type="submit" value="Calculate">
   </form>
 
-    <h3>Macro Nutrients</h3>
-    <table border="1">
-      {% for n in nutrients.general %}
-         <tr>
-           <td>{{ n.nutr_desc|escape }}</td>
-           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
-           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
-         </tr>
-      {% endfor %}
-    </table>
-    <h3>Vitamins</h3>
-    <table border="1">
-      {% for n in nutrients.vitamins %}
-         <tr>
-           <td>{{ n.nutr_desc|escape }}</td>
-           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
-           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
-         </tr>
-      {% endfor %}
-    </table>
-    <h3>Minerals</h3>
-    <table border="1">
-      {% for n in nutrients.minerals %}
-         <tr>
-           <td>{{ n.nutr_desc|escape }}</td>
-           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
-           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
-         <tr>
-      {% endfor %}
-    </table>
-    <h3>Amino Acids</h3>
-    <table border="1">
-      {% for n in nutrients.amino_acids %}
-         <tr>
-           <td>{{ n.nutr_desc|escape }}</td>
-           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
-           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
-         </tr>
-      {% endfor %}
-    </table>
-    <h3>Fats</h3>
-    <table border="1">
-      {% for n in nutrients.fats %}
-         <tr>
-           <td>{{ n.nutr_desc|escape }}</td>
-           <td>{{ n.nutr_value|escape }} {{ n.unit_of_measure|escape }}</td>
-           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
-         </tr>
-      {% endfor %}
-    </table>
+  <div id="nav">
+    <ul>
+      <li><a title="macro" href="#">Macro Nutrients</a></li>
+      <li><a title="vitamins" href="#">Vitamins</a></li>
+      <li><a title="minerals" href="#">Minerals</a></li>
+      <li><a title="aminos" href="#">Amino Acids</a></li>
+      <li><a title="fats" href="#">Fats</a></li>
+    </ul>
+  </div>
+  <div id="tabs">
+    <div id="macro">
+      <table border="1">
+        {% for n in nutrients.general %}
+        <tr>
+          <td>{{ n.nutr_desc|escape }}</td>
+          <td>{{ n.nutr_value|stringformat:".2f" }} {{ n.unit_of_measure|escape }}</td>
+          <td class="graph">
+              <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
+                {{ n.percent_rdi|stringformat:".1f" }}%
+              </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div id="vitamins">
+      <table border="1">
+        {% for n in nutrients.vitamins %}
+        <tr>
+          <td>{{ n.nutr_desc|escape }}</td>
+          <td>{{ n.nutr_value|stringformat:".2f" }} {{ n.unit_of_measure|escape }}</td>
+          <td class="graph">
+              <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
+                {{ n.percent_rdi|stringformat:".1f" }}%
+              </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div id="minerals">
+      <table border="1">
+        {% for n in nutrients.minerals %}
+        <tr>
+          <td>{{ n.nutr_desc|escape }}</td>
+          <td>{{ n.nutr_value|stringformat:".2f" }} {{ n.unit_of_measure|escape }}</td>
+          <td class="graph">
+              <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
+                {{ n.percent_rdi|stringformat:".1f" }}%
+              </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div id="aminos">
+      <table border="1">
+        {% for n in nutrients.amino_acids %}
+        <tr>
+          <td>{{ n.nutr_desc|escape }}</td>
+          <td>{{ n.nutr_value|stringformat:".2f" }} {{ n.unit_of_measure|escape }}</td>
+          <td class="graph">
+              <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
+                {{ n.percent_rdi|stringformat:".1f" }}%
+              </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div id="fats">
+      <table border="1">
+        {% for n in nutrients.fats %}
+        <tr>
+          <td>{{ n.nutr_desc|escape }}</td>
+          <td>{{ n.nutr_value|stringformat:".2f" }} {{ n.unit_of_measure|escape }}</td>
+          <td class="graph">
+              <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
+                {{ n.percent_rdi|stringformat:".1f" }}%
+              </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
   {% endif %}
 {% endblock %}

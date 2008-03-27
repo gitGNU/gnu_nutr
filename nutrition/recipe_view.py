@@ -113,7 +113,10 @@ def clear_recipe_session(session):
 
 def create_new_ingredient(food_id, session):
     ingredient_form = []
-    order_list = session['ingredient_order']
+    if 'ingredient_order' in session:
+        order_list = session['ingredient_order']
+    else:
+        order_list = []
     print 'order_list = ', order_list
     if food_id and int(food_id) not in order_list:
         name = food_id_2_name(food_id)
