@@ -18,109 +18,194 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
-{% block title %}Create Recipe{% endblock %}</title>
+{% block title %}Create Recipe{% endblock %}
+
+{% block menu_create_recipe %}class="active"{% endblock %}
 
 {% block content %}
-  <h1>Search</h1>
+
+  <h1>Create Recipe</h1>
   <form action="/create_recipe/" method="POST">
-    <p>
-    Name: {{ recipe.name|escape }}
-    {% if recipe.name.errors %}<span class="errors">*</span>{% endif %}
-    Number Servings: {{ recipe.num_servings }}
-    {% if recipe.num_servings.errors %}<span class="errors">*</span>{% endif %}
-    Category: {{ recipe.category }}
-    {% if recipe.category.errors %}<span class="errors">*</span>{% endif %}
-    </p>
-    <br />
-    {% if ingredient_list %}
-    <table border="1">
-      <tr>
-        <th></th>
-        <th>Number</th>
-        <th>Measure</th>
-        <th>Food</th>
-        <th>Calories (Per Serving)</th>
-      </tr>
-    {% for ingredient in ingredient_list %}
-      {{ ingredient.food_id }}
-      {{ ingredient.name }}
-      <tr>
-        <td>{{ ingredient.check|escape }}
-          {% if ingredient.check.errors %}<span class="errors">*</span>{% endif %}
-        </td>
-        <td>{{ ingredient.num_measures|escape }}
-          {% if ingredient.num_measures.errors %}<span class="errors">*</span>{% endif %}
-        </td>
-        <td>{{ ingredient.measure|escape }}
-          {% if ingredient.measure.errors %}<span class="errors">*</span>{% endif %}
-        </td>
-        <td><a id="odd" href="/food_search/food_id/{{ ingredient.id }}/measure/{{ ingredient.measure_str }}/amount/{{ ingredient.amount }}">{{ ingredient.name_str }}</a></td>
-        <td> {{ ingredient.calories|stringformat:".2f" }}</td>
-      </tr>
-    {% endfor %}
-    </table>
-    {% endif %}
-    <br />
+    <div id="recipeid">
+      <div id="recipename">
+        <label for="id_name"> Recipe Name :</label> {{ recipe.name|escape }}
+        {% if recipe.name.errors %}<span class="errors">*</span>{% endif %}
+      </div>
+      <div id="recipenumserv">
+        <label for="id_num_servings" class="labelclass">Number Servings :</label> {{ recipe.num_servings|escape }}
+        {% if recipe.num_servings.errors %}<span class="errors">*</span>{% endif %}
+      </div>
+      <div id="recipecategory">
+        <label for="id_category" class="labelclass">Category :</label> {{ recipe.category }}
+        {% if recipe.category.errors %}<span class="errors">*</span>{% endif %}
+      </div>
+    </div>
+    <div id="ingredientform">
+      <table class="recipeingredients">
+        <tr>
+          <th class="first"></th>
+          <th class="second">Amount</th>
+          <th class="third">Measure</th>
+          <th class="fourth">Food</th>
+          <th class="fifth">Calories</th>
+        </tr>
+        {% if ingredient_list %}
+        {% for ingredient in ingredient_list %}
+        {{ ingredient.food_id }}
+        {{ ingredient.name }}
+        <tr>
+          <td class="first">{{ ingredient.check|escape }}
+            {% if ingredient.check.errors %}<span class="errors">*</span>{% endif %}
+          </td>
+          <td class="second">{{ ingredient.num_measures|escape }}
+            {% if ingredient.num_measures.errors %}<span class="errors">*</span>{% endif %}
+          </td>
+          <td class="third">{{ ingredient.measure|escape }}
+            {% if ingredient.measure.errors %}<span class="errors">*</span>{% endif %}
+          </td>
+          <td class="fourth"><a id="odd" href="/food_search/food_id/{{ ingredient.id }}/measure/{{ ingredient.measure_str }}/amount/{{ ingredient.amount }}">{{ ingredient.name_str }}</a></td>
+          <td class="fifth"> {{ ingredient.calories|stringformat:".2f" }}</td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr><td></td><td></td><td></td><td></td></tr>
+        {% endif %}
+      </table>
+    <div id="buttons">
+      <input type="submit" name="add_ingredient" value="Add Ingredient">
+      <input type="submit" name="delete_ingredient" value="Delete Ingredient">
+      <input type="submit" name="save_recipe" value="Save Recipe">
+      <input type="submit" name="refresh" value="Calculate">
+    </div>
+    </form>
+    </div>
     {% ifequal save_result 0 %}
-      <p>Cannot Save: correct entries highlighted with '*'</p>
+      <p class="errors">Cannot Save: correct entries highlighted with '*'</p>
     {% endifequal %}
-    <input type="submit" name="refresh" value="Refresh">
-    <input type="submit" name="add_ingredient" value="Add Ingredient">
-    <input type="submit" name="delete_ingredient" value="Delete Ingredient">
-    <input type="submit" name="save_recipe" value="Save Recipe">
-  </form>
 
   {% if nutrients.general %}
-    <h3>Macro Nutrients</h3>
-    <table border="1">
-      {% for n in nutrients.general %}
-         <tr>
-           <td>{{ n.nutr_desc }}</td>
-           <td>{{ n.nutr_value|stringformat:".2f" }} {{ n.unit_of_measure }}</td>
-           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
-         </tr>
-      {% endfor %}
-    </table>
-    <h3>Vitamins</h3>
-    <table border="1">
-      {% for n in nutrients.vitamins %}
-         <tr>
-           <td>{{ n.nutr_desc }}</td>
-           <td>{{ n.nutr_value|stringformat:".2f" }} {{ n.unit_of_measure }}</td>
-           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
-         </tr>
-      {% endfor %}
-    </table>
-    <h3>Minerals</h3>
-    <table border="1">
-      {% for n in nutrients.minerals %}
-         <tr>
-           <td>{{ n.nutr_desc }}</td>
-           <td>{{ n.nutr_value|stringformat:".2f" }} {{ n.unit_of_measure }}</td>
-           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
-         <tr>
-      {% endfor %}
-    </table>
-    <h3>Amino Acids</h3>
-    <table border="1">
-      {% for n in nutrients.amino_acids %}
-         <tr>
-           <td>{{ n.nutr_desc }}</td>
-           <td>{{ n.nutr_value|stringformat:".2f" }} {{ n.unit_of_measure }}</td>
-           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
-         </tr>
-      {% endfor %}
-    </table>
-    <h3>Fats</h3>
-    <table border="1">
-      {% for n in nutrients.fats %}
-         <tr>
-           <td>{{ n.nutr_desc }}</td>
-           <td>{{ n.nutr_value|stringformat:".2f" }} {{ n.unit_of_measure }}</td>
-           <td>{{ n.percent_rdi|stringformat:".1f" }}</td>
-         </tr>
-      {% endfor %}
-    </table>
-  {% endif %}
 
+  <div id="nav">
+    <ul>
+      <li><a title="macro" href="#">Macro Nutrients</a></li>
+      <li><a title="vitamins" href="#">Vitamins</a></li>
+      <li><a title="minerals" href="#">Minerals</a></li>
+      <li><a title="aminos" href="#">Amino Acids</a></li>
+      <li><a title="fats" href="#">Fats</a></li>
+    </ul>
+  </div>
+  <div id="tabs">
+    <div id="macro">
+      <table>
+        <tr>
+          <th>Nutrient</th>
+          <th colspan="2">Value</th>
+          <th colspan="2">% DV</th>
+        </tr>
+        {% for n in nutrients.general %}
+        <tr>
+          <td>{{ n.nutr_desc }}</td>
+          <td class="right">{{ n.nutr_value|stringformat:".2f" }}</td>
+          <td class="left">{{ n.unit_of_measure }}</td>
+          <td class="right">{{ n.percent_rdi|stringformat:".1f" }}</td>
+          <td class="graph">
+            <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
+            {{ n.percent_rdi|stringformat:".1f" }}%
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div id="vitamins">
+      <table>
+        <tr>
+          <th>Nutrient</th>
+          <th colspan="2">Value</th>
+          <th colspan="2">% DV</th>
+        </tr>
+        {% for n in nutrients.vitamins %}
+        <tr>
+          <td>{{ n.nutr_desc }}</td>
+          <td class="right">{{ n.nutr_value|stringformat:".2f" }}</td>
+          <td class="left">{{ n.unit_of_measure }}</td>
+          <td class="right">{{ n.percent_rdi|stringformat:".1f" }}</td>
+          <td class="graph">
+            <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
+            {{ n.percent_rdi|stringformat:".1f" }}%
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div id="minerals">
+      <table>
+        <tr>
+          <th>Nutrient</th>
+          <th colspan="2">Value</th>
+          <th colspan="2">% DV</th>
+        </tr>
+        {% for n in nutrients.minerals %}
+        <tr>
+          <td>{{ n.nutr_desc }}</td>
+          <td class="right">{{ n.nutr_value|stringformat:".2f" }}</td>
+          <td class="left">{{ n.unit_of_measure }}</td>
+          <td class="right">{{ n.percent_rdi|stringformat:".1f" }}</td>
+          <td class="graph">
+            <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
+            {{ n.percent_rdi|stringformat:".1f" }}%
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div id="aminos">
+      <table>
+        <tr>
+          <th>Nutrient</th>
+          <th colspan="2">Value</th>
+          <th colspan="2">% DV</th>
+        </tr>
+        {% for n in nutrients.amino_acids %}
+        <tr>
+          <td>{{ n.nutr_desc }}</td>
+          <td class="right">{{ n.nutr_value|stringformat:".2f" }}</td>
+          <td class="left">{{ n.unit_of_measure }}</td>
+          <td class="right">{{ n.percent_rdi|stringformat:".1f" }}</td>
+          <td class="graph">
+            <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
+            {{ n.percent_rdi|stringformat:".1f" }}%
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div id="fats">
+      <table>
+        <tr>
+          <th>Nutrient</th>
+          <th colspan="2">Value</th>
+          <th colspan="2">% DV</th>
+        </tr>
+        {% for n in nutrients.fats %}
+        <tr>
+          <td>{{ n.nutr_desc }}</td>
+          <td class="right">{{ n.nutr_value|stringformat:".2f" }}</td>
+          <td class="left">{{ n.unit_of_measure }}</td>
+          <td class="right">{{ n.percent_rdi|stringformat:".1f" }}</td>
+          <td class="graph">
+            <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
+            {{ n.percent_rdi|stringformat:".1f" }}%
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+{% endif %}
 {% endblock %}
+

@@ -42,7 +42,10 @@ class PlanRecipeForm(forms.Form):
     measure = forms.CharField(widget=forms.TextInput(attrs={'readonly':''}))
 
 def abbreviated_days():
-    return day_abbr
+    day_list = [];
+    for day in day_abbr:
+        day_list.append(day[0])
+    return day_list
 
 def abbreviated_month(i):
     return month_abbr[i]

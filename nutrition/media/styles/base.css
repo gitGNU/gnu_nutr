@@ -1,14 +1,37 @@
 html {
   background-color: white;
-  color: #002B3D;
-  font-family: "Lucida Grande", Verdana, Lucida, Helvetica, Arial, sans-serif;
-  font-size: 0.8em;
+  color: #000;
+  font-family: Verdana, Lucida, Helvetica, Arial, sans-serif;
+  font-size: 0.85em;
   line-height: 1.5em;
 }
 
 body {
   margin: 0;
   padding: 0;
+}
+
+form
+{
+  margin-bottom: 1em;
+  padding: 0.5em;
+/*   border: 1px solid #000; */
+}
+
+form label
+{
+  padding-right: 0.5em;
+}
+
+div #food-amount
+{
+  display: inline;
+}
+
+div #food-measure
+{
+  padding-left: 2em;
+  display: inline;
 }
 
 dl {
@@ -23,14 +46,13 @@ dt {
 h1, h2, h3, h4, h5, h6
 {
   font-weight: normal;
-  color: #6d4c07; /* ubuntu dark brown */
+  color: #000;
   line-height: 1.2em;
 }
 
 h1
 {
   font-size: 1.6em;
-  /* border-bottom: 2px solid #6d4c07; */
 }
 
 h2 {font-size: 1.4em;}
@@ -44,7 +66,7 @@ div#container
   margin-left: 3em;
   margin-right: 3em;
   margin-bottom: 3em;
-  background-color: #fff;
+  background-color: #ddd;
   border: 1px solid gray;
 }
 
@@ -61,35 +83,60 @@ div#header h1
   margin: 0;
 }
 
-div#leftnav
+div#left-hs
 {
   float: left;
   padding: 0;
   width: 16em;
   margin: 0;
-  border-right: 1px solid gray;
+  background-color: #fff;
+/*   border-right: 1px solid gray; */
 }
 
-div#leftnav h4
+div#left-hs h4
 {
   padding: 0;
-  margin: 0;
-  margin-left: 2em;
-  margin-top: 1em;
+  margin: 2px 0 2px 2px;
+  text-align: left;
+  text-indent: 2em;
+  background: #ddd;
+  font-weight: bold;
 }
 
-div#leftnav ul
+div#left-hs a
 {
+  text-decoration: none;
+  font-weight: bold;
+  color: #0000FF;
+  display: block;
+  background: #EBECE4;
+  margin: 2px 0 2px 2px;
   padding: 0;
-  margin: 0;
-  margin-left: 3em;
+  text-align: left;
+  text-indent: 2em;
+}
+
+div#left-hs a.active
+{
+  background: #A9A9A9;
+}
+
+div#left-hs a:hover
+{
+  text-decoration: underline;
+  background: #ddd;
+}
+
+div#left-hs a:visited
+{
+  color: #0000FF;
 }
 
 div#content
 {
   margin-left: 16em;
-  border-left: 1px solid gray;
   padding: 1em;
+  background-color: #fff;
 }
 
 div#footer
@@ -105,70 +152,263 @@ div#footer h5
   margin: 0;
 }
 
-#nav {
-  border-bottom : 1px solid #ccc;
-  margin : 0;
-  padding-bottom : 19px;
-  padding-left : 10px;
-  padding-top : 10px;
+#nav
+{
+  border-bottom: 1px solid black;
+  margin: 0;
+  padding: 0;
 }
 
-#nav ul, #nav li {
-  display : inline;
-  list-style-type : none;
-  margin : 0;
-  padding : 0;
+#nav ul
+{
+  margin: 0;
+  padding: 0;;
 }
 
-#tabs {
-  background : #fff;
-  border : 1px solid #ccc;
-  border-top : none;
-/*   clear : both; */
-  margin : 0px;
-  padding : 15px;
+#nav li
+{
+  display: inline;
+  overflow: hidden;
 }
 
-#nav a:link, #nav a:visited {
-  background : #ddd;
-  border : 1px solid #ccc;
-  color : #666;
-  float : left;
-  font-size : small;
-  font-weight : normal;
-  line-height : 14px;
-  margin-right : 8px;
-  padding : 2px 10px 2px 10px;
-  text-decoration : none;
-}
-
-#nav a:link.active, #nav a:visited.active {
-  background : #fff;
-  border-bottom : 1px solid #fff;
-  color : #000;
-}
-
-#nav a:hover {
-  color : #f00;
+#nav a, a.activetab
+{
+  color: #000;
+  background: #ddd;
+  border: 1px solid black;
+  padding: 2px 5px 0px 5px;
+  margin: 0;
+  text-decoration: none;
 }
 
 #nav a.activetab
 {
-  font-weight : bold;
-  background : #a2cd5a;
+  background: #A9A9A9;
 }
 
+#nav a:hover
+{
+  background: #F0F8FF;
+}
+
+#tabs
+{
+  padding: 1em;
+  border: 1px solid black;
+  border-top: none;
+}
+
+#tabs table
+{
+  width: 100%;
+}
 
 .graph {
         position: relative;
-        width: 200px;
-/*         border: 1px solid #a2cd5a; */
-        padding: 2px;
+        width: 60%;
 }
-.graph span#bar {
-        display: block;
-        position: relative;
-        background: #a2cd5a;
-        text-align: center;
-        color: #333;
+
+.graph span#bar
+{
+  display: block;
+  position: relative;
+  background: #a2cd5a;
+  border: 1px solid #000;
+  color: #333;
+  text-align: left;
+  text-indent: -9999px;
+  overflow: hidden;
+  line-height: 1em;
+}
+
+table
+{
+  border-color: #000;
+  border-width: 0px 0px 1px 1px;
+  border-style: solid;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th
+{
+  border-color: #000;
+  border-width: 1px 1px 2px 0px;
+  border-style: solid;
+  padding-left: 1em;
+  padding-right: 1em;
+  text-align: left;
+}
+
+td
+{
+  border-color: #000;
+  border-width: 1px 1px 0px 0px;
+  border-style: solid;
+  padding-left: 1em;
+  padding-right: 1em;
+  height: 1.5em;
+  text-align: left;
+}
+
+td.left {
+  text-align: left;
+  padding-left: 0.5em;
+  border-left-width: 0px;
+}
+
+td.right {
+  text-align: right;
+  border-width: 1px 0px 0px 0px;
+  padding-right: 0em;
+}
+
+/* recipe ingredient table */
+
+td.first
+{
+  padding: 0px;
+}
+
+td.second, td.second input, td.third
+{
+  width: 5em;
+  padding: 2px;
+}
+
+.fourth
+{
+  width: 100%;
+  padding-left: 1em;
+}
+
+#ingredientform
+{
+  border: 1px solid #000;
+  margin-bottom: 2em;
+}
+
+#ingredientform #buttons
+{
+  padding: 1em;
+}
+
+#recipeid
+{
+  padding-bottom: 1em;
+  width: 100%;
+}
+
+#recipeid div
+{
+  display: inline;
+}
+
+#recipeid label.labelclass
+{
+  padding-left: 2em
+}
+
+#recipeid #id_num_servings
+{
+  width: 5em;
+}
+
+#recipename input
+{
+  width: 40em;
+}
+
+/* daily plan calendar */
+
+#calendar
+{
+  font-size: 0.85em;
+  background: #ddd;
+  margin: 2px 0 2px 2px;
+  padding-top: 1em;
+  padding-left: 1em;
+  padding-bottom: 0.5em;
+}
+
+#cal-table
+{
+  width: 0%;
+  text-align: center;
+  text-indent: 0em;
+  margin: 2px 0 2px 2px;
+  background: #fff;
+  font-weight: bold;
+  border: 1px solid #000;
+}
+
+
+#cal-table tr, #cal-table td, #cal-table th
+{
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  text-indent: 0px;
+  border-style: none;
+}
+
+#cal-table tr#day_row, tr#year_row, tr#month_row
+{
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  text-indent: 0px;
+  border-bottom: 1px solid #000;
+}
+
+#cal-table td.day_name
+{
+  border-right: 1px solid #000;
+}
+
+#cal-table td#year_date, td#month_date
+{
+  border-right: 1px solid #000;
+  border-left: 1px solid #000;
+}
+
+
+div#left-hs div#calendar a
+{
+  text-decoration: none;
+  color: #0000FF;
+  display: block;
+  background: #EBECE4;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  text-indent: 0;
+  width: 2em;
+}
+
+div#left-hs div#calendar a.active-day
+{
+  text-decoration: underline;
+  background: #A9A9A9;
+}
+
+div#left-hs div#calendar a:hover
+{
+  text-decoration: underline;
+  background: #ddd;
+}
+
+div#plan-form-container
+{
+  border: 1px solid #000;
+}
+
+div#plan-form-buttons
+{
+  margin: 2px;
+}
+
+#input-right
+{
+  float: right;
 }
