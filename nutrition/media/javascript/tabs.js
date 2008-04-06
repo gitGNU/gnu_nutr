@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // When the page is ready
+
 $(document).ready(function(){
         $("#tabs div").each(function(){
                 $(this).hide();
