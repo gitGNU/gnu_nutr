@@ -1,0 +1,28 @@
+#rdi-tabs
+{
+  padding-bottom: 1em;;
+}
+
+#rdi-tabs table
+{
+  width: auto;
+}
+
+#rdi-tabs td
+{
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+#rdi-tabs table td.first
+{
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+
+
+
+
+
+

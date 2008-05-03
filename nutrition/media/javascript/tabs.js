@@ -25,8 +25,9 @@ $(document).ready(function(){
         $("#nav a").click(function(){
                 var AttrTitle = $(this).attr("title");
                 $("#nav a").each(function(){
-                        if ( $(this).hasClass("activetab") )
+                        if ( $(this).hasClass("activetab")){
                             $(this).removeClass("activetab");
+                        }
                     });
                 $(this).addClass("activetab");
                 $("#tabs div").each(function(){

@@ -27,7 +27,8 @@ class FoodSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(FoodSearchForm, self).__init__(*args, **kwargs)
-        self.fields['food_group'].choices = [(g.group_id, g.name) for g in get_food_groups()]
+        self.fields['food_group'].choices = [(g.group_id, g.group_name)
+                                             for g in get_food_groups()]
 
 @login_required
 def plan_add_food(request):

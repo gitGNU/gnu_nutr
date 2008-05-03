@@ -1,0 +1,63 @@
+#recipe-edit-search-form
+{
+  padding-bottom: 1em;
+}
+
+#recipe-edit-search-form label
+{
+  display: block;
+}
+
+#recipe-edit-search-form input
+{
+  width: 30em;
+}
+
+#recipe-edit-search-form .label-input
+{
+  padding-bottom: 0.5em;;
+}
+
+#recipe-edit-search-form input.button
+{
+  width: 10em;
+}
+
+div#container
+{
+  /* left-hs + #food-search-form input + 1 */
+  min-width: 47em;
+}
+
+ul
+{
+  margin-left: 0;
+  padding-left: 0;
+}
+
+#links li
+{
+  list-style: none;
+}
+
+#links a
+{
+  display: block;
+  color: #0000FF;
+  text-decoration: none;
+}
+
+#links a.odd
+{
+  background: #E8E8E8;
+}
+
+#links a:visited
+{
+  color: #0000FF;
+}
+
+#links a:hover
+{
+  text-decoration: underline;
+}

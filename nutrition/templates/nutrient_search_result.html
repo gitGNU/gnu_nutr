@@ -38,7 +38,7 @@
     {% for s in scores %}
     <tr>
       <td>
-        <a id="score" href="food_id/{{ s.food_id|escape }}">{{ s.name|escape }}</a>
+        <a id="score" href="food_id/{{ s.food_id|escape }}">{{ s.name }}</a>
       </td>
       <td>
         {{ s.score|stringformat:".1f" }}

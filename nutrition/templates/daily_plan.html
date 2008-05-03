@@ -22,6 +22,8 @@
 
 {% block menu_daily_plan %}class="active"{% endblock %}
 
+{% block page_css %}<link rel="stylesheet" type="text/css" href="/site_media/styles/plan.css" />{% endblock %}
+
 {% block calendar %}
   <div id="calendar">
   <table id="cal-table">
@@ -69,21 +71,21 @@
     <div id="plan-form-container">
       <table border="1">
         <tr>
-          <th></th>
-          <th>Number</th>
-          <th>Food Measure</th>
-          <th>Name</th>
-          <th>Calories</th>
+          <th class="first"></th>
+          <th class="second">Amount</th>
+          <th class="third">Measure</th>
+          <th class="fourth">Name</th>
+          <th class="fifth">Calories</th>
         </tr>
         {% for item in plan_list %}
         <tr>
-          <td>{{ item.check|escape }}
+          <td class="first">{{ item.check|escape }}
             {% if item.check.errors %}<span class="errors">*</span>{% endif %}
           </td>
-          <td>{{ item.num_measures|escape }}
+          <td class="second">{{ item.num_measures|escape }}
             {% if item.num_measures.errors %}<span class="errors">*</span>{% endif %}
           </td>
-          <td>
+          <td class="third">
             {% ifequal item.item_type "food" %}
             {{ item.measure|escape }}
             {% if item.measure.errors %}<span class="errors">*</span>{% endif %}
@@ -91,28 +93,29 @@
             1 serving
             {% endifequal %}
           </td>
-          <td>
+          <td class="fouth">
             {% ifequal item.item_type "food" %}
-            <a id="odd" href="/food_search/food_id/{{ item.item_id }}/measure/{{ item.measure_str }}/amount/{{ item.amount }}">{{ item.name_str }}</a>
+            <a id="odd" href="/food_search/food_id/{{ item.item_id }}/measure/{{ item.measure_str }}/num_measures/{{ item.amount }}">{{ item.name_str }}</a>
             {% else %}
             <a id="odd" href="/search_recipe/recipe_id/{{ item.item_id }}">{{ item.name_str }}</a>
             {% endifequal %}
             {% if item.name.errors %}<span class="errors">*</span>{% endif %}
           </td>
-          <td>
+          <td class="fifth">
             {{ item.calories }}
           </td>
         </tr>
         {% endfor %}
+        {% for item in filler_list %}
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        {% endfor %}
       </table>
       <div id="plan-form-buttons">
-        <div id="input-right">
-          <input type="submit" name="save" value="Save">
-        </div>
-        <input type="submit" name="refresh" value="Refresh">
+        <input type="submit" name="refresh" value="Re-Calculate">
         <input type="submit" name="add_recipe" value="Add Recipe">
         <input type="submit" name="add_food" value="Add Food">
-        <input type="submit" name="delete" value="Delete">
+        <input type="submit" name="delete" value="Delete Checked">
+        <input type="submit" name="save" value="Save Plan">
       </div>
     </div>
   </form>

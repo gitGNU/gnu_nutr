@@ -20,7 +20,7 @@ from django.shortcuts import render_to_response
 from django import newforms as forms
 
 from models import *
-from constants import tracked_nutrient_id_2_name_measure_dict
+from constants import tracked_nutr_id_2_name_dict
 
 def get_nutrient_search_data_from_session(session):
     data = {}
@@ -70,17 +70,23 @@ def nutrient_search_result(request):
             if score_query != '':
                 score_query += ' + '
 
-            score_query += "(a.value_%s * %f)" % (nutr_id, scaling_factor)
-            select_query += ", a.value_%s" % nutr_id
-            group_by = group_by + ", a.value_%s " % nutr_id
-            nutr_name.names.append(tracked_nutrient_id_2_name_measure_dict[int_nutr_id])
+            score_query += "(value_%s * %f)" % (nutr_id, scaling_factor)
+            select_query += ", value_%s" % nutr_id
+            group_by = group_by + ", value_%s " % nutr_id
+            nutr_name.names.append(tracked_nutr_id_2_name_dict[int_nutr_id])
             nutr_name.names.append('% RDI')
 
     if food_group == '0':
-        query = "select a.food_id, b.name, max(" + score_query + ") as score" + select_query + " from nutrition_nutrient_score a, nutrition_food b where a.food_id = b.food_id group by a.food_id, b.name " + group_by + "order by score desc limit 200;"
+        query = "select food_id, food_name, max(" + score_query + ") as score" + select_query + " from nutrition_nutrient_score group by food_id, food_name " + group_by + "order by score desc limit 200;"
     else:
-        query = "select a.food_id, b.name, max(" + score_query + ") as score" + select_query + " from nutrition_nutrient_score a, nutrition_food b where a.food_id = b.food_id and b.group_id = '" + food_group + "' group by a.food_id, b.name " + group_by + "order by score desc limit 200;"
+        query = "select food_id, food_name, max(" + score_query + ") as score" + select_query + " from nutrition_nutrient_score where group_id = '" + food_group + "' group by food_id, food_name " + group_by + "order by score desc limit 200;"
+
+    print 'query = ', query
     result = my_custom_sql(query)
+
+    print 'result = ', result
+    base_path = request.get_full_path()
+    print 'base_path = ', base_path
 
     scores = []
     for row in result:
@@ -96,6 +102,8 @@ def nutrient_search_result(request):
                 percent_rdi = "-"
             values_list.append(Values(row[3 + i], percent_rdi))
         scores.append(Nutrient_Score(food_id, name, score, values_list))
+
+    print 'scores = ', scores
 
     return render_to_response( 'nutrient_search_result.html',{
             "scores": scores,

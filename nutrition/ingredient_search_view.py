@@ -22,31 +22,32 @@ from django import newforms as forms
 from models import *
 
 class IngredientSearchForm(forms.Form):
-    food_search_str = forms.CharField(required=False)
+    text = forms.CharField(required=False)
     food_group = forms.ChoiceField()
 
     def __init__(self, *args, **kwargs):
         super(IngredientSearchForm, self).__init__(*args, **kwargs)
         self.fields['food_group'].choices = \
-            [(c.group_id, c.name) for c in get_food_groups()]
+            [(c.group_id, c.group_name) for c in get_food_groups()]
 
 @login_required
 def add_ingredient(request):
-    if request.GET:
-        form = IngredientSearchForm(request.GET)
-        if form.is_valid():
-            food_search_str = form.cleaned_data['food_search_str']
-            food_group = int(form.cleaned_data['food_group'])
-            if food_search_str == '':
-                food_list = []
-            else:
-                food_list = get_food_from_food_str(food_search_str, food_group)
-        else:
-            food_list = []
+    data = request.GET.copy()
+    if data.has_key('text'):
+        first_show = False
     else:
-        form = IngredientSearchForm()
+        first_show = True
+    form = IngredientSearchForm(data)
+    if form.is_valid():
+        search_text = form.cleaned_data['text']
+        food_group = int(form.cleaned_data['food_group'])
+        food_list = get_food_from_food_str(search_text, food_group)
+    else:
+        search_text = ""
         food_list = []
 
-    return render_to_response( 'add_ingredient.html',{
-            'form': form,
-            'food_list': food_list})
+    return render_to_response("add_ingredient.html", {
+            "search_text": search_text,
+            "first_show": first_show,
+            "form": form,
+            "food_list": food_list})

@@ -34,7 +34,7 @@ class PlanFoodForm(forms.Form):
         del kwargs['measure']
         super(PlanFoodForm, self).__init__(*args, **kwargs)
         self.fields['measure'].choices = \
-            [(m.id, '%g %s' %(m.amount, m.name)) for m in measure_list]
+            [(m.measure_id, m.measure_name) for m in measure_list]
 
 class PlanRecipeForm(forms.Form):
     check = forms.BooleanField()
@@ -98,7 +98,7 @@ def create_plan_form(session, year, month, day, food_id=None, recipe_id=None):
         prefix = '%s_food' % food_id
         form_data = {'%s-check' % prefix: False,
                      '%s-num_measures' % prefix: 1,
-                     '%s-measure' % prefix: measure[0].id}
+                     '%s-measure' % prefix: measure[0].measure_id}
         form = PlanFoodForm(form_data, measure=measure, prefix=prefix)
     if recipe_id:
         name = get_recipe_name(recipe_id)
@@ -325,15 +325,20 @@ def daily_plan(request, year=None, month=None, day=None, food_id=None, recipe_id
 
         plan_form_list = load_meal_plan_from_session(request.session, year, month, day)
 
+    print 'plan_form_list = ', plan_form_list
+
     nutrients, calorie_dict = get_plan_nutrient_data(request.user, request.session,
                                                      plan_form_list, year, month, day)
 
     plan_form_list = append_to_plan(plan_form_list, calorie_dict, request.session,
                                     year, month, day)
 
+    filler_list = [i for i in range(10 - len(plan_form_list))]
+
     return render_to_response( 'daily_plan.html', {
             "cal": month_calendar,
             "plan_list": plan_form_list,
+            "filler_list": filler_list,
             "nutrients": nutrients,
             "save_result" : save_result
             })

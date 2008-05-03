@@ -27,25 +27,27 @@ class FoodSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(FoodSearchForm, self).__init__(*args, **kwargs)
-        self.fields['food_group'].choices = [(g.group_id, g.name) for g in get_food_groups()]
+        self.fields['food_group'].choices = \
+            [(g.group_id, g.group_name) for g in get_food_groups()]
 
 @login_required
 def food_search( request):
-    if request.method == 'GET':
-        form = FoodSearchForm(request.GET)
-        if form.is_valid():
-            search_text = form.cleaned_data['text']
-            food_group = int(form.cleaned_data['food_group'])
-            foods = get_food_from_food_str(search_text, food_group)
-        else:
-            search_text = ""
-            foods = []
+    data = request.GET.copy()
+    if data.has_key('text'):
+        first_show = False
+    else:
+        first_show = True
+    form = FoodSearchForm(data)
+    if form.is_valid():
+        search_text = form.cleaned_data['text']
+        food_group = int(form.cleaned_data['food_group'])
+        food_list = get_food_from_food_str(search_text, food_group)
     else:
         search_text = ""
-        form = FoodSearchForm()
-        foods = []
+        food_list = []
 
     return render_to_response("food_search.html", {
             "search_text": search_text,
+            "first_show": first_show,
             "form": form,
-            "foods": foods})
+            "foods": food_list})

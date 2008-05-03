@@ -28,6 +28,11 @@ div #food-amount
   display: inline;
 }
 
+.errors
+{
+  color: #FF0000;
+}
+
 div #food-measure
 {
   padding-left: 2em;
@@ -62,10 +67,10 @@ h5, h6 {font-size: 1em;}
 
 div#container
 {
-  margin-top: 2em;
-  margin-left: 3em;
-  margin-right: 3em;
-  margin-bottom: 3em;
+  margin-top: 1em;
+  margin-left: 1em;
+  margin-right: 1em;
+  margin-bottom: 1em;
   background-color: #ddd;
   border: 1px solid gray;
 }
@@ -154,7 +159,12 @@ div#footer h5
 
 #nav
 {
-  border-bottom: 1px solid black;
+  margin: 0;
+  padding: 0;
+}
+
+#nav
+{
   margin: 0;
   padding: 0;
 }
@@ -162,13 +172,18 @@ div#footer h5
 #nav ul
 {
   margin: 0;
-  padding: 0;;
+  padding: 0;
+  border: 0;
+  margin-bottom: -1px;
 }
 
 #nav li
 {
   display: inline;
   overflow: hidden;
+  border: 0;
+  margin: 0;
+  padding: 0;
 }
 
 #nav a, a.activetab
@@ -183,7 +198,8 @@ div#footer h5
 
 #nav a.activetab
 {
-  background: #A9A9A9;
+  background: #fff;
+  border-bottom: 1px solid #fff;
 }
 
 #nav a:hover
@@ -195,7 +211,6 @@ div#footer h5
 {
   padding: 1em;
   border: 1px solid black;
-  border-top: none;
 }
 
 #tabs table
@@ -263,8 +278,6 @@ td.right {
   padding-right: 0em;
 }
 
-/* recipe ingredient table */
-
 td.first
 {
   padding: 0px;
@@ -276,139 +289,13 @@ td.second, td.second input, td.third
   padding: 2px;
 }
 
+td.third select
+{
+  width: 17em;
+}
+
 .fourth
 {
   width: 100%;
   padding-left: 1em;
-}
-
-#ingredientform
-{
-  border: 1px solid #000;
-  margin-bottom: 2em;
-}
-
-#ingredientform #buttons
-{
-  padding: 1em;
-}
-
-#recipeid
-{
-  padding-bottom: 1em;
-  width: 100%;
-}
-
-#recipeid div
-{
-  display: inline;
-}
-
-#recipeid label.labelclass
-{
-  padding-left: 2em
-}
-
-#recipeid #id_num_servings
-{
-  width: 5em;
-}
-
-#recipename input
-{
-  width: 40em;
-}
-
-/* daily plan calendar */
-
-#calendar
-{
-  font-size: 0.85em;
-  background: #ddd;
-  margin: 2px 0 2px 2px;
-  padding-top: 1em;
-  padding-left: 1em;
-  padding-bottom: 0.5em;
-}
-
-#cal-table
-{
-  width: 0%;
-  text-align: center;
-  text-indent: 0em;
-  margin: 2px 0 2px 2px;
-  background: #fff;
-  font-weight: bold;
-  border: 1px solid #000;
-}
-
-
-#cal-table tr, #cal-table td, #cal-table th
-{
-  margin: 0;
-  padding: 0;
-  text-align: center;
-  text-indent: 0px;
-  border-style: none;
-}
-
-#cal-table tr#day_row, tr#year_row, tr#month_row
-{
-  margin: 0;
-  padding: 0;
-  text-align: center;
-  text-indent: 0px;
-  border-bottom: 1px solid #000;
-}
-
-#cal-table td.day_name
-{
-  border-right: 1px solid #000;
-}
-
-#cal-table td#year_date, td#month_date
-{
-  border-right: 1px solid #000;
-  border-left: 1px solid #000;
-}
-
-
-div#left-hs div#calendar a
-{
-  text-decoration: none;
-  color: #0000FF;
-  display: block;
-  background: #EBECE4;
-  margin: 0;
-  padding: 0;
-  text-align: center;
-  text-indent: 0;
-  width: 2em;
-}
-
-div#left-hs div#calendar a.active-day
-{
-  text-decoration: underline;
-  background: #A9A9A9;
-}
-
-div#left-hs div#calendar a:hover
-{
-  text-decoration: underline;
-  background: #ddd;
-}
-
-div#plan-form-container
-{
-  border: 1px solid #000;
-}
-
-div#plan-form-buttons
-{
-  margin: 2px;
-}
-
-#input-right
-{
-  float: right;
 }

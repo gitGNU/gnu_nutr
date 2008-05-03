@@ -23,10 +23,24 @@ from django import newforms as forms
 from models import *
 
 class RdiForm(forms.Form):
-    name = forms.CharField(widget=forms.TextInput(attrs={'readonly':''}))
     min = forms.DecimalField(required=True)
     max = forms.DecimalField(required=True)
-    unit_of_measure = forms.CharField(widget=forms.TextInput(attrs={'readonly':''}))
+
+def set_rdi_form(nutr_id, rdi_dict, desc, unit):
+    form_data = {'%s-min' % nutr_id: rdi_dict[nutr_id][0],
+                 '%s-max' % nutr_id: rdi_dict[nutr_id][1]}
+    rdi_form = RdiForm(form_data, prefix='%s' % nutr_id)
+    rdi_form.name = desc
+    rdi_form.unit_of_measure = unit
+    return rdi_form
+
+def set_rdi_form_from_data(nutr_id, data, desc, unit):
+    form_data = {'%s-min' % nutr_id: data['%s-min' % nutr_id],
+                 '%s-max' % nutr_id: data['%s-max' % nutr_id]}
+    rdi_form = RdiForm(form_data, prefix='%s' % nutr_id)
+    rdi_form.name = desc
+    rdi_form.unit_of_measure = unit
+    return rdi_form
 
 class Nutrient_Category:
     pass
@@ -35,100 +49,34 @@ def set_rdi_form_elements(rdi_list):
     rdi_dict = {}
     for r in rdi_list:
         rdi_dict[r.nutrient_id] = (r.min_nutrient_value, r.max_nutrient_value)
-    nutrient_category = Nutrient_Category()
-    nutrient_category.general = []
-    for nutr_id, unit, desc in tracked_nutrient.general:
-        form_data = {'%s-name' % nutr_id: desc,
-                     '%s-min' % nutr_id: rdi_dict[nutr_id][0],
-                     '%s-max' % nutr_id: rdi_dict[nutr_id][1],
-                     '%s-unit_of_measure' % nutr_id: unit}
-        nutrient_category.general.append(RdiForm(form_data, prefix='%s' % nutr_id))
-    nutrient_category.minerals = []
-    for nutr_id, unit, desc in tracked_nutrient.minerals:
-        form_data = {'%s-name' % nutr_id: desc,
-                     '%s-min' % nutr_id: rdi_dict[nutr_id][0],
-                     '%s-max' % nutr_id: rdi_dict[nutr_id][1],
-                     '%s-unit_of_measure' % nutr_id: unit}
-        nutrient_category.minerals.append(RdiForm(form_data, prefix='%s' % nutr_id))
-    nutrient_category.vitamins = []
-    for nutr_id, unit, desc in tracked_nutrient.vitamins:
-        form_data = {'%s-name' % nutr_id: desc,
-                     '%s-min' % nutr_id: rdi_dict[nutr_id][0],
-                     '%s-max' % nutr_id: rdi_dict[nutr_id][1],
-                     '%s-unit_of_measure' % nutr_id: unit}
-        nutrient_category.vitamins.append(RdiForm(form_data, prefix='%s' % nutr_id))
-    nutrient_category.amino_acids = []
-    for nutr_id, unit, desc in tracked_nutrient.amino_acids:
-        form_data = {'%s-name' % nutr_id: desc,
-                     '%s-min' % nutr_id: rdi_dict[nutr_id][0],
-                     '%s-max' % nutr_id: rdi_dict[nutr_id][1],
-                     '%s-unit_of_measure' % nutr_id: unit}
-        nutrient_category.amino_acids.append(RdiForm(form_data, prefix='%s' % nutr_id))
-    nutrient_category.fats = []
-    for nutr_id, unit, desc in tracked_nutrient.fats:
-        form_data = {'%s-name' % nutr_id: desc,
-                     '%s-min' % nutr_id: rdi_dict[nutr_id][0],
-                     '%s-max' % nutr_id: rdi_dict[nutr_id][1],
-                     '%s-unit_of_measure' % nutr_id: unit}
-        nutrient_category.fats.append(RdiForm(form_data, prefix='%s' % nutr_id))
+    nutrient_category = {}
+    nutr_groups = ['general', 'vitamins', 'minerals', 'amino_acids', 'fats']
+    for group in nutr_groups:
+        nutrient_category[group] = []
+        for nutr_id, unit, desc, min_val, max_val in tracked_nutrient[group]:
+            rdi_form = set_rdi_form(nutr_id, rdi_dict, desc, unit)
+            nutrient_category[group].append(rdi_form)
     return nutrient_category
 
 def load_post_data_to_form(data):
     nutrient_category = Nutrient_Category()
     nutrient_category.general = []
-    for nutr_id, unit, desc in tracked_nutrient.general:
-        form_data = {'%s-name' % nutr_id: desc,
-                     '%s-min' % nutr_id: data['%s-min' % nutr_id],
-                     '%s-max' % nutr_id: data['%s-max' % nutr_id],
-                     '%s-unit_of_measure' % nutr_id: unit}
-        nutrient_category.general.append(RdiForm(form_data, prefix='%s' % nutr_id))
-    nutrient_category.minerals = []
-    for nutr_id, unit, desc in tracked_nutrient.minerals:
-        form_data = {'%s-name' % nutr_id: desc,
-                     '%s-min' % nutr_id: data['%s-min' % nutr_id],
-                     '%s-max' % nutr_id: data['%s-max' % nutr_id],
-                     '%s-unit_of_measure' % nutr_id: unit}
-        nutrient_category.minerals.append(RdiForm(form_data, prefix='%s' % nutr_id))
-    nutrient_category.vitamins = []
-    for nutr_id, unit, desc in tracked_nutrient.vitamins:
-        form_data = {'%s-name' % nutr_id: desc,
-                     '%s-min' % nutr_id: data['%s-min' % nutr_id],
-                     '%s-max' % nutr_id: data['%s-max' % nutr_id],
-                     '%s-unit_of_measure' % nutr_id: unit}
-        nutrient_category.vitamins.append(RdiForm(form_data, prefix='%s' % nutr_id))
-    nutrient_category.amino_acids = []
-    for nutr_id, unit, desc in tracked_nutrient.amino_acids:
-        form_data = {'%s-name' % nutr_id: desc,
-                     '%s-min' % nutr_id: data['%s-min' % nutr_id],
-                     '%s-max' % nutr_id: data['%s-max' % nutr_id],
-                     '%s-unit_of_measure' % nutr_id: unit}
-        nutrient_category.amino_acids.append(RdiForm(form_data, prefix='%s' % nutr_id))
-    nutrient_category.fats = []
-    for nutr_id, unit, desc in tracked_nutrient.fats:
-        form_data = {'%s-name' % nutr_id: desc,
-                     '%s-min' % nutr_id: data['%s-min' % nutr_id],
-                     '%s-max' % nutr_id: data['%s-max' % nutr_id],
-                     '%s-unit_of_measure' % nutr_id: unit}
-        nutrient_category.fats.append(RdiForm(form_data, prefix='%s' % nutr_id))
+    nutrient_category = {}
+    nutr_groups = ['general', 'vitamins', 'minerals', 'amino_acids', 'fats']
+    for group in nutr_groups:
+        nutrient_category[group] = []
+        for nutr_id, unit, desc, min_val, max_val in tracked_nutrient[group]:
+            rdi_form = set_rdi_form_from_data(nutr_id, data, desc, unit)
+            nutrient_category[group].append(rdi_form)
     return nutrient_category
 
 
 def all_is_valid(nutrients):
-    for n in nutrients.general:
-        if not n.is_valid():
-            return False
-    for n in nutrients.vitamins:
-        if not n.is_valid():
-            return False
-    for n in nutrients.minerals:
-        if not n.is_valid():
-            return False
-    for n in nutrients.amino_acids:
-        if not n.is_valid():
-            return False
-    for n in nutrients.fats:
-        if not n.is_valid():
-            return False
+    nutr_groups = ['general', 'vitamins', 'minerals', 'amino_acids', 'fats']
+    for group in nutr_groups:
+        for n in nutrients[group]:
+            if not n.is_valid():
+                return False
     return True
 
 @login_required
@@ -140,11 +88,11 @@ def set_rdi(request):
             if all_is_valid(nutrients):
                 save_rdi_to_database(request.user, nutrients)
     else:
-        rdi_list = get_user_rdis(request.user.id)
+        rdi_list = get_user_rdis(request.user)
         if not rdi_list:
             rdi_list = get_default_rdi()
         nutrients = set_rdi_form_elements(rdi_list)
 
     return render_to_response( 'set_rdi.html',{
-            "nutrients":nutrients
+            "nutrients": nutrients
             })

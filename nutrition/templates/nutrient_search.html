@@ -22,14 +22,19 @@
 
 {% block menu_nutrient_search %}class="active"{% endblock %}
 
-{% block content %}
-  <h1>Nutrient Search</h1>
+{% block page_css %}<link rel="stylesheet" type="text/css" href="/site_media/styles/nutrient_search.css" />{% endblock %}
 
-  <form action="." method="GET">
-    Search in Food Group : {{ form.food_group }}
-    <br />
-    <table border="1">
-      <tr><th>Nutrient</th><th>Factor</th>
+{% block content %}
+  <form id="nutrient-search-form" action="." method="GET">
+    <div class="label-input">
+      <label id="food-group" for="id_food_group" class="labelclass">Search in Food Group :</label>
+      {{ form.food_group }}
+    </div>
+    <table id="nutrient-search-table">
+      <tr>
+        <th>Nutrient</th>
+        <th>Factor</th>
+      </tr>
       <tr>
         <td>{{ form.nutrient_1 }}
           {% if errors.nutrient_1 %}<span class="errors">*</span>{% endif %}
@@ -80,6 +85,6 @@
       </tr>
     </table>
     <br />
-    <input type="submit" name="search" value="Search" />
+    <input class="button" type="submit" name="search" value="Search" />
   </form>
 {% endblock %}

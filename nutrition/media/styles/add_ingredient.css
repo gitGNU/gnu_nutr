@@ -1,0 +1,63 @@
+#add-ingredient-form
+{
+/*   padding-bottom: 5em; */
+}
+
+#add-ingredient-form label
+{
+  display: block;
+}
+
+#add-ingredient-form input
+{
+  width: 30em;
+}
+
+#add-ingredient-form .label-input
+{
+  padding-bottom: 0.5em;;
+}
+
+#add-ingredient-form input.button
+{
+  width: auto;
+}
+
+div#container
+{
+  /* left-hs + #add-ingredient-form input + 1 */
+  min-width: 47em;
+}
+
+ul
+{
+  margin-left: 0;
+  padding-left: 0;
+}
+
+#links li
+{
+  list-style: none;
+}
+
+#links a
+{
+  display: block;
+  color: #0000FF;
+  text-decoration: none;
+}
+
+#links a.odd
+{
+  background: #E8E8E8;
+}
+
+#links a:visited
+{
+  color: #0000FF;
+}
+
+#links a:hover
+{
+  text-decoration: underline;
+}

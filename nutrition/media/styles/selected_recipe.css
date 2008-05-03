@@ -1,0 +1,26 @@
+.highlight
+{
+  font-weight: bold;
+}
+
+p
+{
+  margin: 0;
+  padding-bottom: 0.5em;
+}
+
+p.third
+{
+  margin: 0;
+  padding-bottom: 1.5em;
+}
+
+#nav
+{
+  padding-top: 1em;
+}
+
+#edit-recipe
+{
+  margin-top: 1em;
+}

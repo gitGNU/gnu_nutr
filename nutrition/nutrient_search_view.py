@@ -26,16 +26,10 @@ from constants import tracked_nutrient
 
 def get_nutrient_choices():
     choices = [(-1, '')]
-    for nutr_id, unit_of_measure, nutr_desc in tracked_nutrient.general:
-        choices.append((nutr_id, nutr_desc))
-    for nutr_id, unit_of_measure, nutr_desc in tracked_nutrient.vitamins:
-        choices.append((nutr_id, nutr_desc))
-    for nutr_id, unit_of_measure, nutr_desc in tracked_nutrient.minerals:
-        choices.append((nutr_id, nutr_desc))
-    for nutr_id, unit_of_measure, nutr_desc in tracked_nutrient.amino_acids:
-        choices.append((nutr_id, nutr_desc))
-    for nutr_id, unit_of_measure, nutr_desc in tracked_nutrient.fats:
-        choices.append((nutr_id, nutr_desc))
+    nutr_groups = ['general', 'vitamins', 'minerals', 'amino_acids', 'fats']
+    for group in nutr_groups:
+        for nutr_id, unit_of_measure, nutr_desc, min_val, max_val in tracked_nutrient[group]:
+            choices.append((nutr_id, nutr_desc))
     return choices
 
 def get_factor_choices():
@@ -60,7 +54,7 @@ class NutrientSearchForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(NutrientSearchForm, self).__init__(*args, **kwargs)
         self.fields['food_group'].choices = \
-            [(c.group_id, c.name) for c in get_food_groups()]
+            [(c.group_id, c.group_name) for c in get_food_groups()]
         nutr_choices = get_nutrient_choices()
         factor_choices = get_factor_choices()
         self.fields['nutrient_1'].choices = \
@@ -142,6 +136,13 @@ def validate(data):
     if data['nutrient_6'] == '-1' and data['factor_6'] != '0':
         errors.nutrient_6 = True
         has_errors = True
+    if not has_errors:
+        if data['factor_1'] == '0' and data['factor_2'] == '0' \
+                and data['factor_3'] == '0'  and data['factor_4'] == '0' \
+                and data['factor_5'] == '0'  and data['factor_6'] == '0':
+            errors.nutrient_1 = True
+            errors.factor_1 = True
+            has_errors = True
     return has_errors, errors
 
 def save_nutrient_search_data_to_session(session, data):

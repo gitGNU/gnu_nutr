@@ -22,110 +22,114 @@
 
 {% block menu_set_rdi %}class="active"{% endblock %}
 
+{% block page_css %}<link rel="stylesheet" type="text/css" href="/site_media/styles/set_rdi.css" />{% endblock %}
+
 {% block content %}
-    <h1>RDI</h1>
+<form action="." method="POST">
 
-    <form action="." method="POST">
-
-       <h3>General</h3>
-      <table border="1">
+  <div id="nav">
+    <ul>
+      <li><a title="macro" href="#">Macro Nutrients</a></li>
+      <li><a title="vitamins" href="#">Vitamins</a></li>
+      <li><a title="minerals" href="#">Minerals</a></li>
+      <li><a title="aminos" href="#">Amino Acids</a></li>
+      <li><a title="fats" href="#">Fats</a></li>
+    </ul>
+  </div>
+<div id="rdi-tabs">
+  <div id="tabs">
+    <div id="macro">
+      <table>
         <tr>
-          <th>Nutrient</th>
+          <th colspan="1">Nutrient</th>
           <th>Minimum Value</th>
           <th>Maximum Value</th>
-          <th>Measure</th>
         </tr>
         {% for nutr in nutrients.general %}
           <tr>
-            <td>{{ nutr.name|escape }}</td>
+            <td class="first">{{ nutr.name }} ({{ nutr.unit_of_measure }})</td>
             <td>{{ nutr.min|escape }}
               {% if nutr.min.errors %}<span class="errors">*</span>{% endif %}</td>
             <td>{{ nutr.max|escape }}
               {% if nutr.max.errors %}<span class="errors">*</span>{% endif %}</td>
-            <td>{{ nutr.unit_of_measure|escape }}</td>
           </tr>
         {% endfor %}
       </table>
-
-       <h3>Vitamins</h3>
-      <table border="1">
+    </div>
+    <div id="vitamins">
+      <table>
         <tr>
-          <th>Nutrient</th>
+          <th colspan="1">Nutrient</th>
           <th>Minimum Value</th>
           <th>Maximum Value</th>
-          <th>Measure</th>
         </tr>
         {% for nutr in nutrients.vitamins %}
           <tr>
-            <td>{{ nutr.name|escape }}</td>
+            <td class="first">{{ nutr.name }} ({{ nutr.unit_of_measure }})</td>
             <td>{{ nutr.min|escape }}
               {% if nutr.min.errors %}<span class="errors">*</span>{% endif %}</td>
             <td>{{ nutr.max|escape }}
               {% if nutr.max.errors %}<span class="errors">*</span>{% endif %}</td>
-            <td>{{ nutr.unit_of_measure|escape }}</td>
           </tr>
         {% endfor %}
       </table>
-
-       <h3>Minerals</h3>
-      <table border="1">
+    </div>
+    <div id="minerals">
+      <table>
         <tr>
-          <th>Nutrient</th>
+          <th colspan="1">Nutrient</th>
           <th>Minimum Value</th>
           <th>Maximum Value</th>
-          <th>Measure</th>
         </tr>
         {% for nutr in nutrients.minerals %}
           <tr>
-            <td>{{ nutr.name|escape }}</td>
+            <td class="first">{{ nutr.name }} ({{ nutr.unit_of_measure }})</td>
             <td>{{ nutr.min|escape }}
               {% if nutr.min.errors %}<span class="errors">*</span>{% endif %}</td>
             <td>{{ nutr.max|escape }}
               {% if nutr.max.errors %}<span class="errors">*</span>{% endif %}</td>
-            <td>{{ nutr.unit_of_measure|escape }}</td>
           </tr>
         {% endfor %}
       </table>
-
-       <h3>Amino Acids</h3>
-      <table border="1">
+    </div>
+    <div id="aminos">
+      <table>
         <tr>
-          <th>Nutrient</th>
+          <th colspan="1">Nutrient</th>
           <th>Minimum Value</th>
           <th>Maximum Value</th>
-          <th>Measure</th>
         </tr>
         {% for nutr in nutrients.amino_acids %}
           <tr>
-            <td>{{ nutr.name|escape }}</td>
+            <td class="first">{{ nutr.name }} ({{ nutr.unit_of_measure }})</td>
             <td>{{ nutr.min|escape }}
               {% if nutr.min.errors %}<span class="errors">*</span>{% endif %}</td>
             <td>{{ nutr.max|escape }}
               {% if nutr.max.errors %}<span class="errors">*</span>{% endif %}</td>
-            <td>{{ nutr.unit_of_measure|escape }}</td>
           </tr>
         {% endfor %}
       </table>
-
-      <h3>Fats</h3>
-      <table border="1">
+    </div>
+    <div id="fats">
+      <table>
         <tr>
-          <th>Nutrient</th>
+          <th colspan="1">Nutrient</th>
           <th>Minimum Value</th>
           <th>Maximum Value</th>
-          <th>Measure</th>
         </tr>
         {% for nutr in nutrients.fats %}
           <tr>
-            <td>{{ nutr.name|escape }}</td>
+            <td class="first">{{ nutr.name }} ({{ nutr.unit_of_measure }})</td>
             <td>{{ nutr.min|escape }}
               {% if nutr.min.errors %}<span class="errors">*</span>{% endif %}</td>
             <td>{{ nutr.max|escape }}
               {% if nutr.max.errors %}<span class="errors">*</span>{% endif %}</td>
-            <td>{{ nutr.unit_of_measure|escape }}</td>
           </tr>
         {% endfor %}
       </table>
-      <input type="submit" name="save" value="Save" />
-    </form>
+    </div>
+  </div>
+</div>
+  <input type="submit" name="save" value="Save Changes" />
+</form>
 {% endblock %}

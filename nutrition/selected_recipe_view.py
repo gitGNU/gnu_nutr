@@ -36,21 +36,20 @@ class IngredientData:
 
 @login_required
 def selected_recipe(request, recipe_id):
-    recipe_data = get_recipe(recipe_id)
-    recipe = RecipeData(recipe_id, recipe_data.name, recipe_data.category.name,
-                        recipe_data.number_servings)
-    print 'recipe_id = ', recipe.id
+    r = get_recipe(recipe_id)
+    recipe = RecipeData(recipe_id, r.recipe_name, r.category_name,
+                        r.number_servings)
     ingredients = get_ingredients(recipe_id)
     ingredient_list = []
     for i in ingredients:
-        ingredient_list.append(IngredientData(i.food.name, i.number_measures, i.measure.name))
+        ingredient_list.append(IngredientData(i.food_name, i.number_measures, i.measure_name))
     nutrient_vals = get_recipe_nutrient_data(recipe_id)
     nutr_dict = {}
     for n in nutrient_vals:
         nutr_dict[n.nutrient_id] = n.value
     rdi_dict = set_user_rdis_dict(request.user)
     nutrients = populate_nutrient_values(nutr_dict, rdi_dict)
-    if request.user.id == recipe_data.user.id:
+    if request.user.id == r.user.id:
         owner = True
     else:
         owner = False

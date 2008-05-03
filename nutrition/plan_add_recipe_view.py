@@ -27,7 +27,8 @@ class RecipeSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(RecipeSearchForm, self).__init__(*args, **kwargs)
-        self.fields['category'].choices = [(c.id, c.name) for c in get_recipe_categories()]
+        self.fields['category'].choices = [(c.category_id, c.category_name)
+                                           for c in get_recipe_categories()]
 
 
 @login_required

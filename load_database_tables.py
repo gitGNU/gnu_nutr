@@ -19,6 +19,7 @@
 import commands
 import sys
 import os
+import getopt
 
 import settings
 
@@ -53,7 +54,7 @@ def load_food_group(file):
     f_in.close()
     f_out.close()
     psql_copy(file + '_out', 'nutrition_food_group')
-    run_psql_command('INSERT into nutrition_food_group (group_id, name) VALUES (\'0\', \'All\')')
+    run_psql_command('INSERT into nutrition_food_group (group_id, group_name) VALUES (\'0\', \'All\')')
 
 def load_food(file):
     psql_truncate_table('nutrition_food')
@@ -67,17 +68,17 @@ def load_food(file):
     f_out.close()
     psql_copy(file + '_out', 'nutrition_food')
 
-def load_nutrient_definition(file):
-    psql_truncate_table('nutrition_nutrient_definition')
-    f_in = open(file, 'r')
-    f_out = open(file + '_out', 'w')
-    for line in f_in:
-        (nutrient_id, unit_of_measure, dummy1, name, dummy2) = \
-            line.replace('~', '').split('^', 4)
-        f_out.write('%s^%s^%s\r\n' % (nutrient_id, unit_of_measure, name))
-    f_in.close()
-    f_out.close()
-    psql_copy(file + '_out', 'nutrition_nutrient_definition')
+# def load_nutrient_definition(file):
+#     psql_truncate_table('nutrition_nutrient_definition')
+#     f_in = open(file, 'r')
+#     f_out = open(file + '_out', 'w')
+#     for line in f_in:
+#         (nutrient_id, unit_of_measure, dummy1, name, dummy2) = \
+#             line.replace('~', '').split('^', 4)
+#         f_out.write('%s^%s^%s\r\n' % (nutrient_id, unit_of_measure, name))
+#     f_in.close()
+#     f_out.close()
+#     psql_copy(file + '_out', 'nutrition_nutrient_definition')
 
 def load_nutrient_data(file):
     psql_truncate_table('nutrition_nutrient_data')
@@ -100,12 +101,13 @@ def load_measure(file):
             line.replace('~', '').split('^', 5)
         n = (100 * int(food_id) + int(measure_id))
         if amount != '':
-            f_out.write('%d^%s^%s^%s^%s^%s\r\n' %
-                         (n, food_id, measure_id, amount, name, grams))
+            # merge 'amount and name' into single 'measure_name', 'n' is new 'measure_id' (it's unique)
+            f_out.write('%d^%s^%s %s^%s\r\n' %
+                         (n, food_id, amount, name, grams))
     f_in.close()
     f_out.close()
     psql_copy(file + '_out', 'nutrition_measure')
-    run_psql_command('INSERT into nutrition_measure SELECT (100 * foods.food_id) AS id, foods.food_id, 0 AS measure_id, 1 AS amount, \'gm\' AS name, 1.0 AS grams FROM (SELECT DISTINCT(food_id) FROM nutrition_measure) AS foods;')
+    run_psql_command('INSERT into nutrition_measure SELECT (100 * foods.food_id) AS nutrient_id, foods.food_id, \'1 gm\' AS measure_name, 1.0 AS grams FROM (SELECT DISTINCT(food_id) FROM nutrition_measure) AS foods;')
 
 def load_recipe_category(data_dir):
     psql_truncate_table('nutrition_recipe_category')
@@ -121,21 +123,32 @@ def drop_all_tables():
     psql_drop_table('nutrition_food')
     psql_drop_table('nutrition_food_group')
     psql_drop_table('nutrition_nutrient_data')
-    psql_drop_table('nutrition_nutrient_definition')
+#    psql_drop_table('nutrition_nutrient_definition')
     psql_drop_table('nutrition_measure')
 
 def load_all_tables(sr20_dir):
     load_food_group(sr20_dir + '/FD_GROUP.txt')
     load_food(sr20_dir + '/FOOD_DES.txt')
-    load_nutrient_definition(sr20_dir + '/NUTR_DEF.txt')
+#    load_nutrient_definition(sr20_dir + '/NUTR_DEF.txt')
     load_nutrient_data(sr20_dir + '/NUT_DATA.txt')
     load_measure(sr20_dir + '/WEIGHT.txt')
     current_dir = os.getcwd()
     load_recipe_category(current_dir)
     load_nutrient_score(current_dir)
 
+def main(argv):
+    try:
+        opts, args = getopt.getopt(argv, "cd:")
+    except getopt.GetoptError, err:
+        print str(err)
+        sys.exit(2)
+    for o, a in opts:
+        if o == "-c":
+            drop_all_tables()
+        elif o == "-d":
+            load_all_tables(a)
+        else:
+            assert False, "unhandled option"
+
 if __name__== "__main__":
-    if len(sys.argv) == 2:
-        load_all_tables(sys.argv[1])
-    else:
-        print "Usage: " + sys.argv[0] + " <directory>"
+    main(sys.argv[1:])

@@ -1,0 +1,58 @@
+#ingredientform
+{
+  border: 1px solid #000;
+  margin-bottom: 2em;
+}
+
+#ingredientform #buttons
+{
+  padding: 0.5em;
+}
+
+#recipeid
+{
+  padding: 1em;
+}
+
+#recipename input
+{
+  width: 50em;
+}
+
+/* create recipe form */
+
+#recipe-form
+{
+  padding: 1em;
+}
+
+#create-recipe-form
+{
+  padding-bottom: 2em;
+}
+
+#create-recipe-form label, #food-search-form label
+{
+  display: block;
+}
+
+#create-recipe-form input
+{
+  width: 10em;
+}
+
+#create-recipe-form #recipe-name input
+{
+  width: 99%;
+}
+
+#create-recipe-form #num-servings
+{
+  float: left;
+  padding-right: 3em;
+}
+
+#create-recipe-form #num-servings label
+{
+  padding-top: 0.5em;
+}

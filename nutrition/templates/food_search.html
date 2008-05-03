@@ -21,21 +21,36 @@
 {% block title %}Food Search{% endblock %}</title>
 
 {% block menu_food_search %}class="active"{% endblock %}
+{% block page_css %}<link rel="stylesheet" type="text/css" href="/site_media/styles/food_search.css" />{% endblock %}
 
 {% block content %}
-  <h1>Search</h1>
-  <form action="." method="GET">
-    {{ form.text|escape }}{% if form.text.errors %}<span class="errors">*</span>{% endif %}
-    {{ form.food_group|escape }}
-    <input type="submit" value="Search">
+  <form id="food-search-form" action="." method="GET">
+      <div class="label-input">
+        <label id="food-text" for="id_text" class="labelclass">Food to Search :</label>
+        {{ form.text|escape }}
+        {% if not first_show %}
+        {% if form.text.errors %}<span class="errors">*</span>{% endif %}
+        {% endif %}
+      </div>
+      <div class="label-input">
+        <label id="food-group" for="id_food_group" class="labelclass">Food Category :</label>
+        {{ form.food_group|escape }}
+      </div>
+      <input class="button" type="submit" value="Search">
   </form>
+  {% if not foods %}
+  <br />
+  <br />
+  <br />
+  <br />
+  {% endif %}
 
   {% if search_text %}
-    <h2>Results for "{{ search_text|escape }}":</h2>
+    <h2>Search Results</h2>
     {% if foods %}
-      <ul>
+      <ul id="links">
         {% for food in foods %}
-          <li><a id="odd" href="food_id/{{ food.food_id|stringformat:"d" }}">{{ food.name|escape }}</a></li>
+          <li><a class="{% cycle 'odd' 'even' %}" href="food_id/{{ food.food_id|stringformat:"d" }}">{{ food.food_name }}</a></li>
         {% endfor %}
         </ul>
     {% else %}

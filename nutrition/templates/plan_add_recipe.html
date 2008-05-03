@@ -22,24 +22,36 @@
 
 {% block menu_daily_plan %}class="active"{% endblock %}
 
-{% block content %}
+{% block page_css %}<link rel="stylesheet" type="text/css" href="/site_media/styles/plan_add_recipe.css" />{% endblock %}
 
-  <h1>Search</h1>
-  <form action="." method="GET">
-    {{ form.text|escape }}
-    {% if not first_render %}
+{% block content %}
+  <form id="plan-add-recipe-form" action="." method="GET">
+    <div class="label-input">
+      <label id="recipe-text" for="id_text" class="labelclass">Recipe to Search :</label>
+      {{ form.text|escape }}
+      {% if not first_render %}
       {% if form.text.errors %}<span class="errors">*</span>{% endif %}
-    {% endif %}
-    {{ form.category|escape }}
-    <input type="submit" value="Search">
+      {% endif %}
+    </div>
+    <div class="label-input">
+      <label id="food-text" for="id_category" class="labelclass">Recipe Category :</label>
+      {{ form.category|escape }}
+    </div>
+    <input class="button" type="submit" value="Search">
   </form>
+  {% if not recipes %}
+  <br />
+  <br />
+  <br />
+  <br />
+  {% endif %}
 
   {% if text %}
-    <h2>Results for "{{ text|escape }}":</h2>
+    <h2>Search Results</h2>
     {% if recipes %}
-      <ul>
+      <ul id="links">
         {% for r in recipes %}
-        <li><a id="odd" href="{{ base_path }}/recipe_id/{{ r.id|stringformat:"d" }}">{{ r.name|escape }}</a></li>
+        <li><a class="{% cycle 'odd' 'even' %}" href="{{ base_path }}/recipe_id/{{ r.recipe_id|stringformat:"d" }}">{{ r.recipe_name }}</a></li>
         {% endfor %}
         </ul>
     {% else %}

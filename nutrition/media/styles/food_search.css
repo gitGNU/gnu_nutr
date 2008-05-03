@@ -1,0 +1,63 @@
+#food-search-form
+{
+/*   padding-bottom: 5em; */
+}
+
+#food-search-form label
+{
+  display: block;
+}
+
+#food-search-form input
+{
+  width: 30em;
+}
+
+#food-search-form .label-input
+{
+  padding-bottom: 0.5em;;
+}
+
+#food-search-form input.button
+{
+  width: auto;
+}
+
+div#container
+{
+  /* left-hs + #food-search-form input + 1 */
+  min-width: 47em;
+}
+
+ul
+{
+  margin-left: 0;
+  padding-left: 0;
+}
+
+#links li
+{
+  list-style: none;
+}
+
+#links a
+{
+  display: block;
+  color: #0000FF;
+  text-decoration: none;
+}
+
+#links a.odd
+{
+  background: #E8E8E8;
+}
+
+#links a:visited
+{
+  color: #0000FF;
+}
+
+#links a:hover
+{
+  text-decoration: underline;
+}

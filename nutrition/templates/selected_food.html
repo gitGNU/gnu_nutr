@@ -22,22 +22,22 @@
 
 {% block menu_food_search %}class="active"{% endblock %}
 
+{% block page_css %}<link rel="stylesheet" type="text/css" href="/site_media/styles/selected_food.css" />{% endblock %}
+
 {% block content %}
-
-  {% if name %}
-
-  <h1>Selected Food : {{ name|escape }}</h1>
-
-  <form action="/food_search/food_id/{{ food_id }}" method="GET">
-    <div id="food-amount">
-      {{ form.amount.label_tag }}:
-      {{ form.amount}} {% if form.amount.errors %}<span class="errors">*</span>{% endif %}
+  {% if food_name %}
+  <h1>{{ food_name }}</h1>
+  <form id="selected-food-form" action="/food_search/food_id/{{ food_id }}" method="GET">
+    <div class="label-input">
+      <label id="food-text" for="id_num_measures" class="labelclass">Number Measures :</label>
+      {{ form.num_measures|escape }}
+      {% if form.num_measures.errors %} <span class="errors">*</span>{% endif %}
     </div>
-    <div id="food-measure">
-      {{ form.measure.label_tag }}:
+    <div class="label-input">
+      <label id="food-text" for="id_measures" class="labelclass">Measures :</label>
       {{ form.measure }}
     </div>
-    <input type="submit" value="Calculate">
+    <input class="button" type="submit" value="Calculate">
   </form>
 
   <div id="nav">

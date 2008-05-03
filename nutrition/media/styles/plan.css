@@ -1,0 +1,97 @@
+#calendar
+{
+  font-size: 0.85em;
+  background: #ddd;
+  margin: 2px 0 2px 2px;
+  padding-top: 1em;
+  padding-left: 1em;
+  padding-bottom: 0.5em;
+}
+
+#cal-table
+{
+  width: 0%;
+  text-align: center;
+  text-indent: 0em;
+  margin: 2px 0 2px 2px;
+  background: #fff;
+  font-weight: bold;
+  border: 1px solid #000;
+}
+
+
+#cal-table tr, #cal-table td, #cal-table th
+{
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  text-indent: 0px;
+  border-style: none;
+}
+
+#cal-table tr#day_row, tr#year_row, tr#month_row
+{
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  text-indent: 0px;
+  border-bottom: 1px solid #000;
+}
+
+#cal-table td.day_name
+{
+  border-right: 1px solid #000;
+}
+
+#cal-table td#year_date, td#month_date
+{
+  border-right: 1px solid #000;
+  border-left: 1px solid #000;
+}
+
+
+div#left-hs div#calendar a
+{
+  text-decoration: none;
+  color: #0000FF;
+  display: block;
+  background: #EBECE4;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  text-indent: 0;
+  width: 2em;
+}
+
+div#left-hs div#calendar a.active-day
+{
+  text-decoration: underline;
+  background: #A9A9A9;
+}
+
+div#left-hs div#calendar a:hover
+{
+  text-decoration: underline;
+  background: #ddd;
+}
+
+div#plan-form-container
+{
+  border: 1px solid #000;
+}
+
+div#plan-form-buttons
+{
+  margin: 2px;
+}
+
+#input-right
+{
+  float: right;
+}
+
+
+
+
+
+

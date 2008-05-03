@@ -22,25 +22,39 @@
 
 {% block menu_edit_recipe %}class="active"{% endblock %}
 
+{% block page_css %}<link rel="stylesheet" type="text/css" href="/site_media/styles/edit_recipe_search.css" />{% endblock %}
+
 {% block content %}
-  <h1>Search</h1>
-  <form action="." method="GET">
-    {{ form.text|escape }}
-    {% if not first_show %}
-        {% if form.text.errors %}<span class="errors">*</span>{% endif %}
-    {% endif %}
-    {{ form.category|escape }}
-    <input type="submit" value="Search">
+  <form id="recipe-edit-search-form" action="." method="GET">
+    <div class="label-input">
+      <label id="food-text" for="id_text" class="labelclass">Recipe to Search :</label>
+      {{ form.text|escape }}
+      {% if not first_show %}
+      {% if form.text.errors %}<span class="errors">*</span>{% endif %}
+      {% endif %}
+    </div>
+    <div class="label-input">
+      <label id="food-text" for="id_category" class="labelclass">Recipe Category :</label>
+      {{ form.category|escape }}
+    </div>
+    <input class="button" type="submit" value="Search">
   </form>
 
+  {% if not recipes %}
+  <br />
+  <br />
+  <br />
+  <br />
+  {% endif %}
+
   {% if text %}
-    <h2>Results for "{{ text|escape }}":</h2>
+    <h2>Recipes Found :</h2>
     <p>select recipe to edit.</p>
     <p>You can only edit recipes that you have created.</p>
     {% if recipes %}
-      <ul>
+      <ul id="links">
         {% for recipe in recipes %}
-          <li><a id="odd" href="/edit_recipe/recipe_id/{{ recipe.id|stringformat:"d" }}">{{ recipe.name }}</a></li>
+          <li><a class="{% cycle 'odd' 'even' %}" href="/edit_recipe/recipe_id/{{ recipe.recipe_id|stringformat:"d" }}">{{ recipe.recipe_name }}</a></li>
         {% endfor %}
       </ul>
     {% else %}

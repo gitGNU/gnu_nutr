@@ -1,0 +1,46 @@
+#nutrient-search-form
+{
+/*   padding-bottom: 5em; */
+}
+
+#nutrient-search-form label
+{
+  display: block;
+}
+
+#nutrient-search-form input
+{
+  width: 30em;
+}
+
+#nutrient-search-form .label-input
+{
+  padding-bottom: 2em;
+}
+
+#nutrient-search-form input.button
+{
+  width: auto;
+}
+
+div#container
+{
+  /* left-hs + #nutrient-search-form input + 1 */
+  min-width: 47em;
+}
+
+table#nutrient-search-table
+{
+  width: auto;
+}
+
+table#nutrient-search-table td, table#nutrient-search-table tr
+{
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+table#nutrient-search-table select
+{
+  width: 100%;
+}

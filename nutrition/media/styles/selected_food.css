@@ -1,0 +1,30 @@
+#selected-food-form
+{
+  padding-bottom: 1em;
+}
+
+#selected-food-form label
+{
+  display: block;
+}
+
+#selected-food-form input
+{
+  width: 30em;
+}
+
+#selected-food-form .label-input
+{
+  padding-bottom: 0.5em;;
+}
+
+#selected-food-form input.button
+{
+  width: 10em;
+}
+
+div#container
+{
+  /* left-hs + #food-search-form input + 1 */
+  min-width: 47em;
+}

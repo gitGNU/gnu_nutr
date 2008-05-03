@@ -1,0 +1,62 @@
+#plan-add-food-form
+{
+  padding-bottom: 1em;
+}
+
+#plan-add-food-form label
+{
+  display: block;
+}
+
+#plan-add-food-form input
+{
+  width: 30em;
+}
+
+#plan-add-food-form .label-input
+{
+  padding-bottom: 0.5em;;
+}
+
+#plan-add-food-form input.button
+{
+  width: 10em;
+}
+
+div#container
+{
+  min-width: 47em;
+}
+
+ul
+{
+  margin-left: 0;
+  padding-left: 0;
+}
+
+#links li
+{
+  list-style: none;
+}
+
+#links a
+{
+  display: block;
+  color: #0000FF;
+  text-decoration: none;
+}
+
+#links a.odd
+{
+  background: #E8E8E8;
+}
+
+#links a:visited
+{
+  color: #0000FF;
+}
+
+#links a:hover
+{
+  text-decoration: underline;
+}
