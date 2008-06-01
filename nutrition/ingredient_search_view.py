@@ -31,7 +31,7 @@ class IngredientSearchForm(forms.Form):
             [(c.group_id, c.group_name) for c in get_food_groups()]
 
 @login_required
-def add_ingredient(request):
+def add_ingredient(request, recipe_id=None):
     data = request.GET.copy()
     if data.has_key('text'):
         first_show = False
@@ -50,4 +50,5 @@ def add_ingredient(request):
             "search_text": search_text,
             "first_show": first_show,
             "form": form,
+            "recipe_id": recipe_id,
             "food_list": food_list})

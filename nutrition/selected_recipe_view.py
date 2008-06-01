@@ -29,10 +29,12 @@ class RecipeData:
         self.number_servings = number_servings
 
 class IngredientData:
-    def __init__(self, name, num_measures, measure):
-        self.name = name
-        self.num_measures = num_measures
-        self.measure = measure
+    def __init__(self, food_id, food_name, number_measures, measure_name, measure_id):
+        self.food_id = food_id
+        self.food_name = food_name
+        self.number_measures = number_measures
+        self.measure_name = measure_name
+        self.measure_id = measure_id
 
 @login_required
 def selected_recipe(request, recipe_id):
@@ -42,7 +44,7 @@ def selected_recipe(request, recipe_id):
     ingredients = get_ingredients(recipe_id)
     ingredient_list = []
     for i in ingredients:
-        ingredient_list.append(IngredientData(i.food_name, i.number_measures, i.measure_name))
+        ingredient_list.append(IngredientData(i.food_id, i.food_name, i.number_measures, i.measure_name, i.measure_id))
     nutrient_vals = get_recipe_nutrient_data(recipe_id)
     nutr_dict = {}
     for n in nutrient_vals:
@@ -53,6 +55,8 @@ def selected_recipe(request, recipe_id):
         owner = True
     else:
         owner = False
+
+    print 'ingredient_list = ', ingredient_list
 
     return render_to_response( 'selected_recipe.html', {
             "recipe": recipe,

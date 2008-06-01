@@ -37,9 +37,9 @@
         </tr>
         {% for ingredient in ingredient_list %}
           <tr>
-            <td>{{ ingredient.num_measures|escape }}</td>
-            <td>{{ ingredient.measure|escape }}</td>
-            <td>{{ ingredient.name|escape }}</td>
+            <td>{{ ingredient.number_measures }}</td>
+            <td>{{ ingredient.measure_name }}</td>
+            <td><a href="/food_search/food_id/{{ ingredient.food_id }}/measure/{{ ingredient.measure_id }}/num_measures/{{ ingredient.number_measures }}">{{ ingredient.food_name }}</a></td>
           </tr>
         {% endfor %}
       </table>

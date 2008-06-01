@@ -30,7 +30,6 @@ class RecipeSearchForm(forms.Form):
         self.fields['category'].choices = [(c.category_id, c.category_name)
                                            for c in get_recipe_categories()]
 
-
 @login_required
 def search_recipe(request):
     data = request.GET.copy()
@@ -54,6 +53,7 @@ def search_recipe(request):
             "recipes": recipes
             })
 
+@login_required
 def search_edit_recipe(request):
     data = request.GET.copy()
     if data.has_key('text'):

@@ -43,116 +43,115 @@ class IngredientForm(forms.Form):
         self.fields['measure'].choices = \
             [(m.measure_id, m.measure_name) for m in measure_list]
 
-def load_recipe_from_id(recipe_id):
+def load_recipe_from_database(recipe_id):
     ingredient_form_list = []
-    ingredient_order = []
-    recipe = None
-    recipe_data = get_recipe(recipe_id)
-    form_data = {'name': recipe_data.recipe_name,
-                 'num_servings': recipe_data.number_servings,
-                 'category':  recipe_data.category_id}
-    recipe_form = RecipeForm(form_data)
-    ingredients = get_ingredients(recipe_id)
-    for i in ingredients:
-        food_id = i.food_id
-        ingredient_order.append(food_id)
-        measure = get_measures(food_id)
-        form_data = {'%s-check' % food_id: False,
-                     '%s-num_measures' % food_id: i.number_measures,
-                     '%s-measure' % food_id: i.measure_id}
-        ingredient_form = IngredientForm(form_data, measure=measure, prefix=food_id)
-        ingredient_form_list.append(ingredient_form)
-    return recipe_form, ingredient_form_list, ingredient_order
-
-def load_recipe_from_session(session):
-    ingredient_form_list = []
-    recipe = None
-    if 'recipe_data' in session:
-        recipe_data = session['recipe_data']
-        form_data = {'name': recipe_data['name'],
-                     'num_servings': recipe_data['num_servings'],
-                     'category':  recipe_data['category']}
+    if recipe_id:
+        r = get_recipe(recipe_id)
+        form_data = {'name': r.recipe_name,
+                     'num_servings': r.number_servings,
+                     'category':  r.category_id}
         recipe_form = RecipeForm(form_data)
-        ingredient_order = []
-        if 'ingredient_order' in session:
-            ingredient_order = session['ingredient_order']
-            for food_id in ingredient_order:
-                measure = get_measures(food_id)
-                form_data = {'%s-check' % food_id: False,
-                             '%s-num_measures' % food_id: recipe_data['%s-num_measures' % food_id],
-                             '%s-measure' % food_id: recipe_data['%s-measure' % food_id]}
-                ingredient_form = IngredientForm(form_data, measure=measure, prefix=food_id)
-                ingredient_form_list.append(ingredient_form)
-    return recipe_form, ingredient_form_list, ingredient_order
-
-def save_recipe_to_session(session, data):
-    session['recipe_data'] = {}
-    for key, val in data.items():
-        session['recipe_data'][key] = val
-
-def save_recipe_from_id_to_session(session, recipe_form, ingredient_form_list):
-    session['recipe_data'] = {}
-    order_list = []
-    for key, val in recipe_form.data.items():
-        session['recipe_data'][key] = val
-    for form in ingredient_form_list:
-        for key, val in form.data.items():
-            split_list = key.split('-')
-            if split_list[1] == 'check':
-                order_list.append(split_list[0])
-            session['recipe_data'][key] = val
-    session['ingredient_order'] = order_list
-
-def clear_recipe_session(session):
-    if 'ingredient_order' in session:
-        del session['ingredient_order']
-    if 'recipe_data' in session:
-        del session['recipe_data']
-
-def create_new_ingredient(food_id, session):
-    ingredient_form = []
-    if 'ingredient_order' in session:
-        order_list = session['ingredient_order']
+        ingredient_list = get_ingredients(recipe_id)
+        for i in ingredient_list:
+            f = get_food(i.food_id)
+            measure_list = get_measures(i.food_id)
+            measure = get_measure_from_measure_list(measure_list, i.measure_id)
+            form_data = {'%s-check' % i.food_id: False,
+                         '%s-num_measures' % i.food_id: i.number_measures,
+                         '%s-measure' % i.food_id: i.measure_id}
+            ingredient_form = IngredientForm(form_data, measure=measure_list, prefix=i.food_id)
+            ingredient_form.food_id = i.food_id
+            ingredient_form.food_name = f.food_name
+            ingredient_form.measure_str = measure.measure_name
+            ingredient_form.amount = i.number_measures
+            ingredient_form_list.append(ingredient_form)
     else:
-        order_list = []
-    if food_id and int(food_id) not in order_list:
-        name = food_id_2_name(food_id)
-        measure = get_measures(food_id)
-        ingredient_data = {'%s-check' % food_id: False,
-                           '%s-num_measures' % food_id: 1,
-                           '%s-measure' % food_id: measure[0].measure_id}
-        ingredient_form = IngredientForm(ingredient_data, measure=measure, prefix=food_id)
-        if ingredient_form:
-            session['recipe_data']['%s-food_id' % food_id] = food_id
-            session['recipe_data']['%s-name' % food_id] = name
-            session['recipe_data']['%s-num_measures' % food_id] = 1
-            session['recipe_data']['%s-measure' % food_id] = measure[0].measure_id
-            session['ingredient_order'] = order_list + [int(food_id)]
+        recipe_category_list = get_recipe_categories()
+        form_data = {'name': "Insert your Recipe's Name here",
+                     'num_servings': 1.0,
+                     'category':  recipe_category_list[0].category_id}
+        recipe_form = RecipeForm(form_data)
+    return recipe_form, ingredient_form_list
+
+def create_forms_from_data(data, recipe_form, ingredient_form_list):
+    new_ingredient_form_list = []
+    if not data['name']:
+        data['name'] = "Insert your Recipe's Name here"
+    try:
+        num_servings = float(data['num_servings'])
+    except ValueError:
+        num_servings = 1.0
+    if num_servings > 100.0:
+        num_servings = 100.0
+    form_data = {'name': data['name'],
+                   'num_servings': num_servings,
+                   'category':  data['category']}
+    new_recipe_form = RecipeForm(form_data)
+    for i in ingredient_form_list:
+        f = get_food(i.food_id)
+        measure_list = get_measures(i.food_id)
+        measure_id = data['%s-measure' % i.food_id]
+        measure = get_measure_from_measure_list(measure_list, measure_id)
+        if '%s-check' % i.food_id in data:
+            check = data['%s-check' % i.food_id]
+        else:
+            check = False
+        num_measures = data['%s-num_measures' % i.food_id]
+        try:
+            num_measures = float(num_measures)
+        except ValueError:
+            num_measures = '1.0'
+            if num_measures > 10000.0:
+                num_measures = 10000.0
+        form_data = {'%s-check' % i.food_id: check,
+                     '%s-num_measures' % i.food_id: num_measures,
+                     '%s-measure' % i.food_id: measure_id}
+        new_ingredient_form = IngredientForm(form_data, measure=measure_list, prefix=i.food_id)
+        new_ingredient_form.food_id = i.food_id
+        new_ingredient_form.food_name = f.food_name
+        new_ingredient_form.measure_str = measure.measure_name
+        new_ingredient_form.amount = num_measures
+        new_ingredient_form_list.append(new_ingredient_form)
+    return new_recipe_form, new_ingredient_form_list
+
+def food_in_recipe(food_id, ingredient_form_list):
+    for form in ingredient_form_list:
+        if '%s-measure' % food_id in form.data:
+            return True
+    return False
+
+def create_new_ingredient(food_id):
+    name = food_id_2_name(food_id)
+    f = get_food(food_id)
+    measure_list = get_measures(food_id)
+    ingredient_data = {'%s-check' % food_id: False,
+                       '%s-num_measures' % food_id: 1.0,
+                       '%s-measure' % food_id: measure_list[0].measure_id}
+    ingredient_form = IngredientForm(ingredient_data, measure=measure_list, prefix=food_id)
+    ingredient_form.food_id = int(food_id)
+    ingredient_form.food_name = f.food_name
+    ingredient_form.measure_str = measure_list[0].measure_name
+    ingredient_form.amount = 1.0
     return ingredient_form
 
-def delete_ingredients(session, data):
-    if 'ingredient_order' in session:
-        ingredient_order = session['ingredient_order']
-        for food_id in session['ingredient_order']:
-            if '%s-check' % food_id in session['recipe_data']:
-                del session['recipe_data']['%s-num_measures' % food_id]
-                del session['recipe_data']['%s-measure' % food_id]
-                del session['recipe_data']['%s-check' % food_id]
-                ingredient_order.remove(food_id)
-        session['ingredient_order'] = ingredient_order
+def delete_from_recipe(old_ingredient_form_list, data):
+    new_ingredient_plan_list = []
+    for form in old_ingredient_form_list:
+        if '%s-check' % form.food_id not in data:
+            new_ingredient_plan_list.append(form)
+    return new_ingredient_plan_list
 
-def save_recipe(session, user):
-    recipe_form, ingredient_form_list, ingredient_order = load_recipe_from_session(session)
+def save_recipe_form(user, recipe_form, ingredient_form_list):
     if all_is_valid(recipe_form, ingredient_form_list):
-        save_recipe_to_database(user, recipe_form, ingredient_form_list, ingredient_order)
-        return 1
-    return 0
+        recipe_id = save_recipe_to_database(user, recipe_form, ingredient_form_list)
+        return recipe_id
+    return None
 
-def recipe_form_data_2_nutrient_data(user, recipe_form, ingredient_form_list, ingredient_order):
+def calc_recipe_nutrition(user, recipe_form, ingredient_form_list):
     if all_is_valid(recipe_form, ingredient_form_list):
         recipe_data = recipe_form.cleaned_data
         num_servings = recipe_data['num_servings']
-        return calculate_recipe_nutrient_data(user, ingredient_form_list, num_servings, ingredient_order)
+        return calculate_recipe_nutrient_data(user, ingredient_form_list, num_servings)
     else:
         return None, None
 
@@ -166,71 +165,48 @@ def all_is_valid(recipe_form, ingredient_form_list):
 
 @login_required
 def create_recipe(request, food_id=None, recipe_id=None):
-    save_result = 2
-    if recipe_id:
-        recipe_form, ingredient_form_list, ingredient_order = load_recipe_from_id(recipe_id)
-        save_recipe_from_id_to_session(request.session, recipe_form, ingredient_form_list)
-    elif food_id:
-        if food_id == '0':
-            clear_recipe_session(request.session)
-            recipe_form = RecipeForm()
-            ingredient_form_list = []
-            ingredient_order = []
-        else:
-            recipe_form, ingredient_form_list, ingredient_order = load_recipe_from_session(request.session)
-            new_ingredient_form = create_new_ingredient(food_id, request.session)
+    recipe_form, ingredient_form_list = load_recipe_from_database(recipe_id)
 
+    if recipe_id:
+        if food_id and not food_in_recipe(food_id, ingredient_form_list):
+            new_ingredient_form = create_new_ingredient(food_id)
             if new_ingredient_form:
                 ingredient_form_list.append(new_ingredient_form)
-                ingredient_order.append(int(food_id))
-    else:
-        if request.POST:
-            data = request.POST.copy()
-            save_recipe_to_session(request.session, data)
-            if data.has_key('refresh'):
-                None
+                recipe_id = save_recipe_form(request.user, recipe_form, ingredient_form_list)
 
-            if data.has_key('add_ingredient'):
-                return HttpResponseRedirect( '/add_ingredient/')
+    if request.POST:
+        data = request.POST.copy()
+        recipe_form, ingredient_form_list = \
+            create_forms_from_data(data, recipe_form, ingredient_form_list)
 
-            if data.has_key('delete_ingredient'):
-                delete_ingredients(request.session, data)
-                return HttpResponseRedirect( '/create_recipe/')
+        if data.has_key('delete_ingredient'):
+            ingredient_form_list = delete_from_recipe(ingredient_form_list, data)
 
-            if data.has_key('save_recipe'):
-                save_result = save_recipe(request.session, request.user)
+        recipe_id = save_recipe_form(request.user, recipe_form, ingredient_form_list)
 
-        recipe_form, ingredient_form_list, ingredient_order = load_recipe_from_session(request.session)
-    nutrients, calorie_list = recipe_form_data_2_nutrient_data(request.user,
-                                                               recipe_form,
-                                                               ingredient_form_list,
-                                                               ingredient_order)
+        if data.has_key('refresh') or data.has_key('delete_ingredient') or \
+                data.has_key('save_recipe'):
+            return HttpResponseRedirect('/create_recipe/recipe_id/%s/' % recipe_id)
 
-    food_list = get_foods_from_food_id_list(ingredient_order)
+        if data.has_key('add_ingredient'):
+            return HttpResponseRedirect('/create_recipe/recipe_id/%s/add_ingredient/'
+                                        % recipe_id)
 
-    for i in range(0, len(ingredient_form_list)):
+    nutrients, calorie_list = calc_recipe_nutrition(request.user,
+                                                    recipe_form,
+                                                    ingredient_form_list)
+
+    for i, form in enumerate(ingredient_form_list):
         if calorie_list:
             ingredient_form_list[i].calories = calorie_list[i]
-        data = ingredient_form_list[i].data
-        food_id = data.keys()[0].split('-')[0]
-        f = get_food_from_food_list(food_list, food_id)
-        ingredient_form_list[i].food_name = f.food_name
-        ingredient_form_list[i].food_id = food_id
-        ingredient_form_list[i].measure_str = data['%s-measure' % food_id]
-        num_measures = data['%s-num_measures' % food_id]
-        try:
-            val = float(num_measures)
-            ingredient_form_list[i].amount = num_measures
-        except ValueError:
-            ingredient_form_list[i].amount = '1.0'
 
     filler_list = []
     for i in range(10 - len(ingredient_form_list)):
         filler_list.append(i)
 
     return render_to_response( 'create_recipe.html', {
+            "recipe_id": recipe_id,
             "recipe": recipe_form,
             "ingredient_list": ingredient_form_list,
             "filler_list": filler_list,
-            "nutrients": nutrients,
-            "save_result": save_result})
+            "nutrients": nutrients})

@@ -45,7 +45,7 @@
     {% if food_list %}
       <ul id="links">
         {% for food in food_list %}
-          <li><a class="{% cycle 'odd' 'even' %}" href="/create_recipe/{{ food.food_id|stringformat:"d" }}">{{ food.food_name }}</a></li>
+          <li><a class="{% cycle 'odd' 'even' %}" href="/create_recipe/recipe_id/{{ recipe_id }}/food_id/{{ food.food_id|stringformat:"d" }}">{{ food.food_name }}</a></li>
         {% endfor %}
         </ul>
     {% else %}

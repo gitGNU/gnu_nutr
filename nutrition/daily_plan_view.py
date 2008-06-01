@@ -21,6 +21,7 @@ from django import newforms as forms
 
 from calendar import monthcalendar, day_abbr, month_abbr
 from datetime import *
+import time
 
 from models import *
 
@@ -47,6 +48,8 @@ def abbreviated_days():
         day_list.append(day[0])
     return day_list
 
+abbreviated_day_list = abbreviated_days
+
 def abbreviated_month(i):
     return month_abbr[i]
 
@@ -67,142 +70,77 @@ class MonthCalendar:
         self.next_year = year + 1
         self.month = month
         self.next_month = month + 1
-        if self.next_month > 12:
+        if month + 1 > 12:
             self.next_month = 1
-        self.prev_month = month - 1
-        if self.prev_month < 1:
+        else:
+            self.next_month = month + 1
+        if month - 1 < 1:
             self.prev_month = 12
+        else:
+            self.prev_month = month - 1
         self.day = day
         self.month_name = abbreviated_month(month)
-        self.day_names = abbreviated_days()
+        self.day_names = abbreviated_day_list
         self.calendar_rows = monthcalendar(year, month)
 
-def food_in_plan(food_id, session, year, month, day):
-    date_str = '%s%s%s' % (year, month, day)
-    for item_type, item_id in session['plan_order' + date_str]:
-        if item_type == 'food' and item_id == food_id:
+def food_in_plan(food_id, plan_form_list):
+    for form in plan_form_list:
+        if form.item_type == 'food' and form.item_id == food_id:
             return True
     return False
 
-def recipe_in_plan(recipe_id, session, year, month, day):
-    date_str = '%s%s%s' % (year, month, day)
-    for item_type, item_id in session['plan_order' + date_str]:
-        if item_type == 'recipe' and item_id == recipe_id:
+def recipe_in_plan(recipe_id, plan_form_list):
+    for form in plan_form_list:
+        if form.item_type == 'recipe' and form.item_id == recipe_id:
             return True
     return False
 
-def create_plan_form(session, year, month, day, food_id=None, recipe_id=None):
+def create_plan_form(food_id=None, recipe_id=None):
     if food_id:
-        measure = get_measures(food_id)
+        measure_list = get_measures(food_id)
         name = food_id_2_name(food_id)
-        prefix = '%s_food' % food_id
+        prefix = '%s_%s' % (form.item_id, form.item_type)
         form_data = {'%s-check' % prefix: False,
                      '%s-num_measures' % prefix: 1,
-                     '%s-measure' % prefix: measure[0].measure_id}
-        form = PlanFoodForm(form_data, measure=measure, prefix=prefix)
-    if recipe_id:
+                     '%s-measure' % prefix: measure_list[0].measure_id}
+        form = PlanFoodForm(form_data, measure=measure_list, prefix=prefix)
+        form.item_type = 'food'
+        form.item_id = food_id
+        form.name_str = name
+        form.measure_str = measure_list[0].measure_id
+    elif recipe_id:
         name = get_recipe_name(recipe_id)
-        prefix = '%s_recipe' % recipe_id
+        prefix = '%s_%s' % (form.item_id, form.item_type)
         form_data = {'%s-check' % prefix: False,
                      '%s-num_measures' % prefix: 1,
                      '%s-measure' % prefix: '1 serving'}
         form = PlanRecipeForm(form_data, prefix=prefix)
+        form.item_type = 'recipe'
+        form.item_id = recipe_id
+        form.name_str = name
+        form.measure_str = '1 serving'
+    else:
+        return None
     return form
 
-def initialize_plan_session(session, date_str):
-    if 'meal_plan' + date_str not in session:
-        session['meal_plan' + date_str] = {}
-
-def clear_plan_session(session, date_str):
-    if 'meal_plan' + date_str in session:
-        del session['meal_plan' + date_str]
-    if 'plan_order' + date_str in session:
-        del session['plan_order' + date_str]
-
-def add_new_form_to_session(session, year, month, day, form,
-                            food_id=None, recipe_id=None):
-    date_str = '%s%s%s' % (year, month, day)
-    initialize_plan_session(session, date_str)
-    key = 'meal_plan' + date_str
-    order_list = session['plan_order' + date_str]
-    if food_id:
-        name = food_id_2_name(food_id)
-        prefix = '%s_food' % food_id
-        order_list.append(('food', food_id))
-    else:
-        prefix = '%s_recipe' % recipe_id
-        name = get_recipe_name(recipe_id)
-        order_list.append(('recipe', recipe_id))
-    session['plan_order' + date_str] = order_list
-    session[key]['%s-name' % prefix] = name
-    session[key]['%s-num_measures' % prefix] = 1
-    session[key]['%s-measure' % prefix] = form.data['%s-measure' % prefix]
-
-def load_plan_order_from_session(session, year, month, day):
-    date_str = '%s%s%s' % (year, month, day)
-    return session['plan_order' + date_str]
-
-def load_meal_plan_from_session(session, year, month, day):
-    date_str = '%s%s%s' % (year, month, day)
-    plan_form_list = []
-    plan_order = []
-    if 'meal_plan' + date_str in session and \
-            'plan_order' + date_str in session:
-        plan_order = session['plan_order' + date_str]
-        session_data = session['meal_plan' + date_str]
-        for item_type, item_id in plan_order:
-            if item_type == 'food':
-                food_id = item_id
-                measure = get_measures(food_id)
-                prefix = '%s_food' % food_id
-                form_data = {'%s-check' % prefix: False,
-                             '%s-num_measures' % prefix: session_data['%s-num_measures' % prefix],
-                             '%s-measure' % prefix: session_data['%s-measure' % prefix]}
-                form = PlanFoodForm(form_data, measure=measure, prefix=prefix)
-                plan_form_list.append(form)
-            if item_type == 'recipe':
-                recipe_id = item_id
-                prefix = '%s_recipe' % recipe_id
-                form_data = {'%s-check' % prefix: False,
-                             '%s-num_measures' % prefix: session_data['%s-num_measures' % prefix],
-                             '%s-measure' % prefix: '1 serving'}
-                form = PlanRecipeForm(form_data, prefix=prefix)
-                plan_form_list.append(form)
-    return plan_form_list
-
-def save_plan(session, user, year, month, day):
-    plan_form_list = load_meal_plan_from_session(session, year, month, day)
-    plan_order = load_plan_order_from_session(session, year, month, day)
+def save_plan_to_database(user, plan_form_list, year, month, day):
     if all_is_valid(plan_form_list):
-        save_plan_to_database(user, plan_form_list, plan_order, year, month, day)
+        save_plan_to_db(user, plan_form_list, year, month, day)
         return 1
     return 0
 
-def delete_from_plan(session, data, year, month, day):
-    date_str = '%s%s%s' % (year, month, day)
-    meal_key = 'meal_plan' + date_str
-    order_key = 'plan_order' + date_str
-    if order_key in session:
-        order = session[order_key]
-        for item_type, item_id in order:
-            if item_type == 'food':
-                prefix = '%s_food' % item_id
-            if item_type == 'recipe':
-                prefix = '%s_recipe' % item_id
-            if '%s-check' % prefix in session[meal_key]:
-                del session[meal_key]['%s-name' % prefix]
-                del session[meal_key]['%s-num_measures' % prefix]
-                del session[meal_key]['%s-measure' % prefix]
-                del session[meal_key]['%s-check' % prefix]
-                order.remove((item_type, item_id))
-        session[order_key] = order
-
-def save_meal_plan_to_session(session, year, month, day, data):
-    date_str = '%s%s%s' % (year, month, day)
-    key = 'meal_plan' + date_str
-#    session[key] = {}
-    for k, v in data.items():
-        session[key][k] = v
+def delete_from_plan(old_plan_form_list, data):
+    new_plan_form_list = []
+    for form in old_plan_form_list:
+        if form.item_type == 'food':
+            food_id = form.item_id
+            if '%s_food-check' % food_id not in data:
+                new_plan_form_list.append(form)
+        if form.item_type == 'recipe':
+            recipe_id = form.item_id
+            if '%s_recipe-check' % recipe_id not in data:
+                new_plan_form_list.append(form)
+    return new_plan_form_list
 
 def all_is_valid(plan_form_list):
     for form in plan_form_list:
@@ -210,97 +148,175 @@ def all_is_valid(plan_form_list):
             return False
     return True
 
-def get_plan_nutrient_data(user, session, plan_form_list, year, month, day):
+def get_plan_nutrient_data(user, plan_form_list):
     if all_is_valid(plan_form_list):
-        plan_form_data_list = []
-        for form in plan_form_list:
-            plan_form_data_list.append(form.cleaned_data)
-        plan_order = load_plan_order_from_session(session, year, month, day)
-        return calculate_plan_nutrient_data(user, plan_form_data_list, plan_order)
+        return calculate_plan_nutrient_data(user, plan_form_list)
     else:
         return None, None
 
-def load_plan_from_database_to_session(session, user, year, month, day):
-    plan_list = get_user_plan(user, year, month, day)
-    plan_order = []
-    date_str = '%s%s%s' % (year, month, day)
-    initialize_plan_session(session, date_str)
-    key = 'meal_plan' + date_str
-    for o in plan_list:
+def load_plan_from_database(user, year, month, day):
+    plan_data_list = get_user_plan(user, year, month, day)
+    plan_form_list = []
+    for o in plan_data_list:
         if o.item_type == 'F':
             food_id = o.item_id
             prefix = '%s_food' % food_id
-            session[key]['%s-measure' % prefix] = o.measure
-            plan_order.append(('food', food_id))
-        else:
+            measure_list = get_measures(food_id)
+            selected_measure = get_measure_from_measure_list(measure_list, o.measure)
+            name = food_id_2_name(food_id)
+            form_data = {'%s-check' % prefix: False,
+                         '%s-num_measures' % prefix: o.num_measures,
+                         '%s-measure' % prefix: o.measure}
+            form = PlanFoodForm(form_data, measure=measure_list, prefix=prefix)
+            form.item_type = 'food'
+            form.item_id = food_id
+            form.name_str = name
+            form.measure_str = selected_measure.measure_id
+            plan_form_list.append(form)
+        elif o.item_type == 'R':
             recipe_id = o.item_id
+            name = get_recipe_name(recipe_id)
             prefix = '%s_recipe' % recipe_id
-            plan_order.append(('recipe', recipe_id))
-            session[key]['%s-measure' % prefix] = '1 serving'
-        session[key]['%s-num_measures' % prefix] = o.num_measures
-        session[key]['%s-name' % prefix] = o.name
-    session['plan_order' + date_str] = plan_order
-
-def append_to_plan(plan_form_list, calories_dict, session, year, month, day):
-    date_str = '%s%s%s' % (year, month, day)
-    print 'calories_dict = ', calories_dict
-    if 'meal_plan' + date_str in session and \
-            'plan_order' + date_str in session:
-        plan_order = session['plan_order' + date_str]
-        for i in range(0, len(plan_order)):
-            item_type, item_id = plan_order[i]
-            plan_form_list[i].item_type = item_type
-            plan_form_list[i].item_id = item_id
-            prefix = '%s_%s' % (item_id, item_type)
-            plan_form_list[i].name_str = session['meal_plan' + date_str]['%s-name' % prefix]
-            plan_form_list[i].measure_str = session['meal_plan' + date_str]['%s-measure' % prefix]
-            plan_form_list[i].calories = calories_dict[prefix]
-            num_measures = session['meal_plan' + date_str]['%s-num_measures' % prefix]
-            try:
-                val = float(num_measures)
-                plan_form_list[i].amount = num_measures
-            except ValueError:
-                plan_form_list[i].amount = '1.0'
+            form_data = {'%s-check' % prefix: False,
+                         '%s-num_measures' % prefix: o.num_measures,
+                         '%s-measure' % prefix: '1 serving'}
+            form = PlanRecipeForm(form_data, prefix=prefix)
+            form.item_type = 'recipe'
+            form.item_id = recipe_id
+            form.name_str = name
+            form.measure_str = '1 serving'
+            plan_form_list.append(form)
+        else:
+            pass
     return plan_form_list
+
+def create_plan_from_data(data, old_plan_form_list, year, month, day):
+    new_plan_form_list = []
+    for form in old_plan_form_list:
+        if form.item_type == 'food':
+            food_id = form.item_id
+            prefix = '%s_%s' % (form.item_id, form.item_type)
+            measure_list = get_measures(food_id)
+            measure_id = data['%s-measure' % prefix]
+            selected_measure = get_measure_from_measure_list(measure_list, measure_id)
+            name = food_id_2_name(food_id)
+            if '%s-check' % prefix in data:
+                check = data['%s-check' % prefix]
+            else:
+                check = False
+            try:
+                num_measures = float(data['%s-num_measures' % prefix])
+            except ValueError:
+                num_measures = 1.0
+            if num_measures > 10000.0:
+                num_measures = 10000.0
+            form_data = {'%s-check' % prefix: check,
+                         '%s-num_measures' % prefix: num_measures,
+                         '%s-measure' % prefix: measure_id}
+            new_form = PlanFoodForm(form_data, measure=measure_list, prefix=prefix)
+            new_form.item_type = 'food'
+            new_form.item_id = food_id
+            new_form.name_str = name
+            new_form.measure_str = selected_measure.measure_id
+            new_plan_form_list.append(new_form)
+        elif form.item_type == 'recipe':
+            recipe_id = form.item_id
+            prefix = '%s_%s' % (form.item_id, form.item_type)
+            name = get_recipe_name(recipe_id)
+            if '%s-check' % prefix in data:
+                check = data['%s-check' % prefix]
+            else:
+                check = False
+            try:
+                num_measures = float(data['%s-num_measures' % prefix])
+            except ValueError:
+                num_measures = 1.0
+            if num_measures > 10000.0:
+                num_measures = 10000.0
+            form_data = {'%s-check' % prefix: check,
+                         '%s-num_measures' % prefix: num_measures,
+                         '%s-measure' % prefix: '1 serving'}
+            new_form = PlanRecipeForm(form_data, prefix=prefix)
+            new_form.item_type = 'recipe'
+            new_form.item_id = recipe_id
+            new_form.name_str = name
+            new_form.measure_str = '1 serving'
+            new_plan_form_list.append(new_form)
+        else:
+            pass
+    return new_plan_form_list
+
+def append_calorie_data_to_plan(old_plan_form_list, calories_dict):
+    new_plan_form_list = []
+    for form in old_plan_form_list:
+        prefix = '%s_%s' % (form.item_id, form.item_type)
+        form.calories = calories_dict[prefix]
+        try:
+            val = float(form.data['%s-num_measures' % prefix])
+            form.amount = val
+        except ValueError:
+            form.amount = '1.0'
+        new_plan_form_list.append(form)
+    return new_plan_form_list
+
+def parse_date(date_string):
+    try:
+        return time.strptime(date_string, "%Y/%m/%d")
+    except ValueError:
+        return None
 
 @login_required
 def daily_plan(request, year=None, month=None, day=None, food_id=None, recipe_id=None):
     save_result = 2
+
     if year == None or month == None or day == None:
         year, month, day = get_today()
         date_in_url = False
         date_str = '%s%s%s' % (year, month, day)
-        clear_plan_session(request.session, date_str)
     else:
         date_in_url = True
+        date_str = '%s%s%s' % (year, month, day)
 
     month_calendar = MonthCalendar(year, month, day)
 
-    date_str = '%s%s%s' % (year, month, day)
-
     if food_id:
-        plan_form_list = load_meal_plan_from_session(request.session, year, month, day)
-        if not food_in_plan(food_id, request.session, year, month, day):
-            new_form = create_plan_form(request.session, year, month, day, food_id=food_id)
+        plan_form_list = load_plan_from_database(request.user, year, month, day)
+        if not food_in_plan(food_id, plan_form_list):
+            new_form = create_plan_form(food_id=food_id)
             if new_form:
                 plan_form_list.append(new_form)
-                add_new_form_to_session(request.session, year, month, day, \
-                                            new_form, food_id=food_id)
+                save_plan_to_database(request.user, plan_form_list, year, month, day)
     elif recipe_id:
-        plan_form_list = load_meal_plan_from_session(request.session, year, month, day)
-        if not recipe_in_plan(recipe_id, request.session, year, month, day):
-            new_form = create_plan_form(request.session, year, month, day, recipe_id=recipe_id)
+        plan_form_list = load_plan_from_database(request.user, year, month, day)
+        if not recipe_in_plan(recipe_id, plan_form_list):
+            new_form = create_plan_form(recipe_id=recipe_id)
             if new_form:
                 plan_form_list.append(new_form)
-                add_new_form_to_session(request.session, year, month, day, \
-                                            new_form, recipe_id=recipe_id)
+                save_plan_to_database(request.user, plan_form_list, year, month, day)
     else:
+#         if request.GET:
+#             data = request.GET.copy()
+#             clone_date_string = data['clone_date']
+#             clone_date = parse_date(clone_date_string)
+#             print 'clone_date = ', clone_date
+#             if clone_date:
+#                 load_plan_from_database_to_session(request.session,
+#                                                    request.user,
+#                                                    clone_date[0],
+#                                                    clone_date[1],
+#                                                    clone_date[2])
+#                 print '3: plan_order = ', request.session['plan_order' + date_str]
+#                 print '3: meal_plan = ', request.session['meal_plan' + date_str]
+
+#                 print 'session = ', request.session
         if request.POST:
+            plan_form_list = load_plan_from_database(request.user, year, month, day)
             data = request.POST.copy()
-            save_meal_plan_to_session(request.session, year, month, day, data)
+            plan_form_list = create_plan_from_data(data, plan_form_list, year, month, day)
+            save_result = save_plan_to_database(request.user, plan_form_list, year, month, day)
 
             if data.has_key('refresh'):
-                None
+                return HttpResponseRedirect('')
 
             if data.has_key('add_recipe'):
                 if date_in_url:
@@ -315,23 +331,18 @@ def daily_plan(request, year=None, month=None, day=None, food_id=None, recipe_id
                     return HttpResponseRedirect('%s/%s/%s/add_food/' % (year, month, day))
 
             if data.has_key('save'):
-                save_result = save_plan(request.session, request.user, year, month, day)
+                return HttpResponseRedirect('')
 
             if data.has_key('delete'):
-                delete_from_plan(request.session, data, year, month, day)
+                plan_form_list = delete_from_plan(plan_form_list, data)
+                save_plan_to_database(request.user, plan_form_list, year, month, day)
                 return HttpResponseRedirect('')
-        else:
-            load_plan_from_database_to_session(request.session, request.user, year, month, day)
 
-        plan_form_list = load_meal_plan_from_session(request.session, year, month, day)
+        plan_form_list = load_plan_from_database(request.user, year, month, day)
 
-    print 'plan_form_list = ', plan_form_list
+    nutrients, calorie_dict = get_plan_nutrient_data(request.user, plan_form_list)
 
-    nutrients, calorie_dict = get_plan_nutrient_data(request.user, request.session,
-                                                     plan_form_list, year, month, day)
-
-    plan_form_list = append_to_plan(plan_form_list, calorie_dict, request.session,
-                                    year, month, day)
+    plan_form_list = append_calorie_data_to_plan(plan_form_list, calorie_dict)
 
     filler_list = [i for i in range(10 - len(plan_form_list))]
 

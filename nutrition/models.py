@@ -52,6 +52,9 @@ def get_food_from_food_str(food_str, group_id):
     else:
         return Food.objects.filter(group_id = group_id).filter(food_name__icontains = food_str)
 
+def get_food(food_id):
+    return Food.objects.get(food_id=food_id)
+
 def food_id_2_name(food_id):
     return Food.objects.get(food_id=food_id).food_name
 
@@ -120,6 +123,7 @@ def get_food_list_measures(food_id_list):
     return Measure.objects.filter(food_id__in=food_id_list).order_by('measure_id')
 
 def get_measure_from_measure_list(measure_list, measure_id):
+    measure_id = int(measure_id)
     for m in measure_list:
         if m.measure_id == measure_id:
             return m
@@ -246,17 +250,19 @@ def get_plan_recipe_data(recipe_id, recipe_form, all_recipe_data):
                        if elm.recipe_id == recipe_id]
     return recipe_data, num_measures
 
-def calculate_recipe_nutrient_total(ingredient_form_data_list, food_id_list, num_servings):
+def calculate_recipe_nutrient_total(ingredient_form_list, num_servings):
     nutr_dict = {}
     calorie_list = []
-    for id in food_id_list:
+    food_id_list = []
+    for form in ingredient_form_list:
+        food_id_list.append(form.food_id)
         calorie_list.append(0.0)
     for id in all_nutrient_ids:
         nutr_dict[id] = 0.0
     all_food_data, all_measures = get_food_database_data(food_id_list)
-    for i in range(0, len(food_id_list)):
+    for i, form in enumerate(ingredient_form_list):
         food_data, num_measures, grams = \
-            get_recipe_food_data(food_id_list[i], ingredient_form_data_list[i],
+            get_recipe_food_data(form.food_id, form.cleaned_data,
                                  all_food_data, all_measures)
         for nutrient_id, value in food_data:
             nutr_val = value * num_measures * grams / (100.0 * float(num_servings))
@@ -266,7 +272,7 @@ def calculate_recipe_nutrient_total(ingredient_form_data_list, food_id_list, num
                 calorie_list[i] = nutr_val
     return nutr_dict, calorie_list
 
-def calculate_plan_nutrient_total(plan_form_data_list, plan_order):
+def calculate_plan_nutrient_total(plan_form_list):
     nutr_dict = {}
     for id in all_nutrient_ids:
         nutr_dict[id] = 0.0
@@ -277,19 +283,18 @@ def calculate_plan_nutrient_total(plan_form_data_list, plan_order):
     recipe_list = []
     recipe_form_data_list = []
 
-    for i in range(0, len(plan_order)):
-        type, id = plan_order[i]
-        if type == 'food':
-            food_list.append(id)
-            food_form_data_list.append(plan_form_data_list[i])
-        if type == 'recipe':
-            recipe_list.append(id)
-            recipe_form_data_list.append(plan_form_data_list[i])
+    for form in plan_form_list:
+        if form.item_type == 'food':
+            food_list.append(form.item_id)
+            food_form_data_list.append(form.cleaned_data)
+        if form.item_type == 'recipe':
+            recipe_list.append(form.item_id)
+            recipe_form_data_list.append(form.cleaned_data)
     all_food_data, all_measures = get_food_database_data(food_list)
     all_recipe_data = get_recipe_database_data(recipe_list)
 
-    for i in range(0, len(food_list)):
-        food_data, num_measures, grams = get_plan_food_data(food_list[i],
+    for i, food_id in enumerate(food_list):
+        food_data, num_measures, grams = get_plan_food_data(food_id,
                                                             food_form_data_list[i],
                                                             all_food_data,
                                                             all_measures)
@@ -298,10 +303,10 @@ def calculate_plan_nutrient_total(plan_form_data_list, plan_order):
             if nutrient_id in all_nutrient_ids:
                 nutr_dict[nutrient_id] += nutr_val
             if nutrient_id == 208:
-                calorie_dict['%s_food' % food_list[i]] = nutr_val
+                calorie_dict['%s_food' % food_id] = nutr_val
 
-    for i in range(0, len(recipe_list)):
-        recipe_data, num_measures = get_plan_recipe_data(recipe_list[i],
+    for i, recipe_id in enumerate(recipe_list):
+        recipe_data, num_measures = get_plan_recipe_data(recipe_id,
                                                          recipe_form_data_list[i],
                                                          all_recipe_data)
         for nutrient_id, value in recipe_data:
@@ -309,7 +314,7 @@ def calculate_plan_nutrient_total(plan_form_data_list, plan_order):
             if nutrient_id in all_nutrient_ids:
                 nutr_dict[nutrient_id] += nutr_val
             if nutrient_id == 208:
-                calorie_dict['%s_recipe' % recipe_list[i]] = nutr_val
+                calorie_dict['%s_recipe' % recipe_id] = nutr_val
     return nutr_dict, calorie_dict
 
 # -----------------------------------------------------------------
@@ -321,20 +326,15 @@ def set_user_rdis_dict(user):
         rdi_dict[item.nutrient_id] = item.min_nutrient_value
     return rdi_dict
 
-def calculate_plan_nutrient_data(user, plan_form_data_list, plan_order):
+def calculate_plan_nutrient_data(user, plan_form_list):
     rdi_dict = set_user_rdis_dict(user)
-    nutr_dict, calorie_dict = calculate_plan_nutrient_total(plan_form_data_list, plan_order)
+    nutr_dict, calorie_dict = calculate_plan_nutrient_total(plan_form_list)
     nutrients = populate_nutrient_values(nutr_dict, rdi_dict)
     return nutrients, calorie_dict
 
-def calculate_recipe_nutrient_data(user, ingredient_form_list, num_servings, food_id_list):
+def calculate_recipe_nutrient_data(user, ingredient_form_list, num_servings):
     rdi_dict = set_user_rdis_dict(user)
-    ingredient_form_data_list = []
-    for i in range(0, len(ingredient_form_list)):
-        ingredient_form_data = ingredient_form_list[i].cleaned_data
-        ingredient_form_data_list.append(ingredient_form_data)
-    nutr_dict, calorie_list = calculate_recipe_nutrient_total(ingredient_form_data_list,
-                                                             food_id_list, num_servings)
+    nutr_dict, calorie_list = calculate_recipe_nutrient_total(ingredient_form_list, num_servings)
     nutrients = populate_nutrient_values(nutr_dict, rdi_dict)
     return nutrients, calorie_list
 
@@ -378,9 +378,9 @@ class Recipe(models.Model):
     number_servings = models.PositiveSmallIntegerField()
 
     def __unicode__(self):
-        return u'%d, %s, %s, %f' % (self.user.id, self.recipe_name,
-                                    self.category_id,
-                                    self.number_servings)
+        return u'%d, %d, %s, %s, %f' % (self.user.id, self.recipe_id, self.recipe_name,
+                                        self.category_id,
+                                        self.number_servings)
 
 def get_recipes_matching(text, category_id):
     if category_id == '0' or category_id == 0:
@@ -403,6 +403,9 @@ def get_recipe_exact_match_owned_by_user(user, recipe_name):
 def get_recipe(recipe_id):
     return Recipe.objects.filter(recipe_id=recipe_id).get()
 
+def get_recipe_owned_by_user(user, recipe_id):
+    return Recipe.objects.filter(user=user).filter(recipe_id=recipe_id).get()
+
 def get_recipe_name(recipe_id):
     return Recipe.objects.filter(recipe_id=recipe_id).get().recipe_name
 
@@ -419,10 +422,7 @@ class Ingredient(models.Model):
     number_measures = models.FloatField()
 
     def __unicode__(self):
-        return u'%d, %d, %d, %d, %f' % (self.recipe_id, self.order,
-                                        self.food_id,
-                                        self.measure_id,
-                                        self.number_measures)
+        return u'%d, %d, %s, %d, %s, %f, %d' %(self.order, self.measure_id, self.measure_name, self.food_id, self.food_name, self.number_measures, self.recipe_id)
 
 def get_ingredients(recipe_id):
     return Ingredient.objects.filter(recipe_id=recipe_id).order_by('order')
@@ -448,23 +448,28 @@ def get_recipe_nutrient_data(recipe_id):
 #     preparation_desc = models.TextField()
 
 @transaction.commit_on_success
-def save_recipe_to_database(user, recipe_form, ingredient_form_list, food_id_list):
+def save_recipe_to_database(user, recipe_form, ingredient_form_list):
     recipe_form_data = recipe_form.cleaned_data
 
-    # TODO: could probably do a search on recipe_id rather than a name search.
-    old_recipe = get_recipe_exact_match_owned_by_user(user, recipe_form_data['name'])
-    if old_recipe:
-        old_recipe_id = old_recipe.recipe_id
-        Ingredient.objects.filter(recipe_id=old_recipe_id).delete()
-        Recipe_Nutrient_Data.objects.filter(recipe_id=old_recipe_id).delete()
-        old_recipe.delete()
+    # delete any old recipes with the same name.
+    r1 = get_recipe_exact_match_owned_by_user(user, recipe_form_data['name'])
+    if r1:
+        Ingredient.objects.filter(recipe_id=r1.recipe_id).delete()
+        Recipe_Nutrient_Data.objects.filter(recipe_id=r1.recipe_id).delete()
+        r1.delete()
+
+    # Try and re-use an existing recipe_id owned by user
+    if r1:
+        recipe_id = r1.recipe_id
+    else:
+        recipe_id = None
 
     num_servings = recipe_form_data['num_servings']
     category_id = recipe_form_data['category']
 
-    if old_recipe:
+    if recipe_id:
         r = Recipe(user=user,
-                   recipe_id=old_recipe_id,
+                   recipe_id=recipe_id,
                    recipe_name=recipe_form_data['name'],
                    category_id=category_id,
                    category_name=get_recipe_category(category_id).category_name,
@@ -476,33 +481,35 @@ def save_recipe_to_database(user, recipe_form, ingredient_form_list, food_id_lis
                    category_name=get_recipe_category(category_id).category_name,
                    number_servings=num_servings)
     r.save()
-    ingredient_form_data_list = []
 
-    # Avoid a set of queries for each loop, so get all the data before looping
+    food_id_list = []
+    for i in ingredient_form_list:
+        food_id_list.append(i.food_id)
+
+    # Avoid a looping set of queries, so get all the data before looping
     ingredient_measure_list = get_food_list_measures(food_id_list)
     ingredient_food_list = get_foods_from_food_id_list(food_id_list)
 
-    for i in range(0, len(ingredient_form_list)):
-        ingredient_form_data = ingredient_form_list[i].cleaned_data
-        food_id = food_id_list[i]
+    for j, form in enumerate(ingredient_form_list):
+        ingredient_form_data = form.cleaned_data
         measure_id = int(ingredient_form_data['measure'])
+        num_measures = float(ingredient_form_data['num_measures'])
         m = get_measure_from_measure_list(ingredient_measure_list, measure_id)
-        f = get_food_from_food_list(ingredient_food_list, food_id)
-        ingredient_form_data_list.append(ingredient_form_data)
-        ing = Ingredient(order=i,
+        f = get_food_from_food_list(ingredient_food_list, form.food_id)
+        ing = Ingredient(order=j,
                          measure_id=measure_id,
                          measure_name=m.measure_name,
-                         food_id=food_id,
+                         food_id=form.food_id,
                          food_name=f.food_name,
-                         number_measures=ingredient_form_data['num_measures'],
+                         number_measures=num_measures,
                          recipe_id=r.recipe_id)
         ing.save()
-    nutr_dict, calorie_list = calculate_recipe_nutrient_total(ingredient_form_data_list,
-                                                              food_id_list,
+    nutr_dict, calorie_list = calculate_recipe_nutrient_total(ingredient_form_list,
                                                               num_servings)
     for key, val in nutr_dict.items():
         d = Recipe_Nutrient_Data(recipe_id=r.recipe_id, nutrient_id=key, value=val)
         d.save()
+    return r.recipe_id
 
 # -----------------------------------------------------------------
 
@@ -663,24 +670,25 @@ class Plan(models.Model):
         self.plan_date.strftime('%d')
 
 @transaction.commit_on_success
-def save_plan_to_database(user, plan_form_list, plan_order, year, month, day):
+def save_plan_to_db(user, plan_form_list, year, month, day):
     plan_date = datetime.date(int(year), int(month), int(day))
     old_plan = Plan.objects.filter(user=user).filter(plan_date=plan_date)
     for o in old_plan:
         o.delete()
-    for i in range(0, len(plan_form_list)):
-        plan_data = plan_form_list[i].cleaned_data
-        type, item_id = plan_order[i]
-        if type == 'food':
+    for i, form in enumerate(plan_form_list):
+        plan_data = form.cleaned_data
+        if form.item_type == 'food':
             item_type = 'F'
             measure = plan_data['measure']
-            name = food_id_2_name(item_id)
-        else:
+            name = food_id_2_name(form.item_id)
+        elif form.item_type == 'recipe':
             item_type = 'R'
             measure = 0
-            name = get_recipe_name(item_id)
+            name = get_recipe_name(form.item_id)
+        else:
+            continue
         o = Plan(order=i, user=user, plan_date=plan_date, measure=measure,
-                 item_id=item_id, item_type=item_type,
+                 item_id=form.item_id, item_type=item_type,
                  num_measures=plan_data['num_measures'],
                  name=name)
         o.save()
