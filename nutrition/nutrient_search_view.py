@@ -44,12 +44,6 @@ class NutrientSearchForm(forms.Form):
     factor_2 = forms.ChoiceField()
     nutrient_3 = forms.ChoiceField()
     factor_3 = forms.ChoiceField()
-    nutrient_4 = forms.ChoiceField()
-    factor_4 = forms.ChoiceField()
-    nutrient_5 = forms.ChoiceField()
-    factor_5 = forms.ChoiceField()
-    nutrient_6 = forms.ChoiceField()
-    factor_6 = forms.ChoiceField()
 
     def __init__(self, *args, **kwargs):
         super(NutrientSearchForm, self).__init__(*args, **kwargs)
@@ -63,23 +57,11 @@ class NutrientSearchForm(forms.Form):
             [(c[0], c[1]) for c in nutr_choices]
         self.fields['nutrient_3'].choices = \
             [(c[0], c[1]) for c in nutr_choices]
-        self.fields['nutrient_4'].choices = \
-            [(c[0], c[1]) for c in nutr_choices]
-        self.fields['nutrient_5'].choices = \
-            [(c[0], c[1]) for c in nutr_choices]
-        self.fields['nutrient_6'].choices = \
-            [(c[0], c[1]) for c in nutr_choices]
         self.fields['factor_1'].choices = \
             [(c[0], c[1]) for c in factor_choices]
         self.fields['factor_2'].choices = \
             [(c[0], c[1]) for c in factor_choices]
         self.fields['factor_3'].choices = \
-            [(c[0], c[1]) for c in factor_choices]
-        self.fields['factor_4'].choices = \
-            [(c[0], c[1]) for c in factor_choices]
-        self.fields['factor_5'].choices = \
-            [(c[0], c[1]) for c in factor_choices]
-        self.fields['factor_6'].choices = \
             [(c[0], c[1]) for c in factor_choices]
 
 class FormErrors:
@@ -90,12 +72,6 @@ class FormErrors:
         self.nutrient_2 = False
         self.factor_3 = False
         self.nutrient_3 = False
-        self.factor_4 = False
-        self.nutrient_4 = False
-        self.factor_5 = False
-        self.nutrient_5 = False
-        self.factor_6 = False
-        self.nutrient_6 = False
 
 def validate(data):
     errors = FormErrors()
@@ -118,28 +94,9 @@ def validate(data):
     if data['nutrient_3'] == '-1' and data['factor_3'] != '0':
         errors.nutrient_3 = True
         has_errors = True
-    if data['nutrient_4'] != '-1' and data['factor_4'] == '0':
-        errors.factor_4 = True
-        has_errors = True
-    if data['nutrient_4'] == '-1' and data['factor_4'] != '0':
-        errors.nutrient_4 = True
-        has_errors = True
-    if data['nutrient_5'] != '-1' and data['factor_5'] == '0':
-        errors.factor_5 = True
-        has_errors = True
-    if data['nutrient_5'] == '-1' and data['factor_5'] != '0':
-        errors.nutrient_5 = True
-        has_errors = True
-    if data['nutrient_6'] != '-1' and data['factor_6'] == '0':
-        errors.factor_6 = True
-        has_errors = True
-    if data['nutrient_6'] == '-1' and data['factor_6'] != '0':
-        errors.nutrient_6 = True
-        has_errors = True
     if not has_errors:
         if data['factor_1'] == '0' and data['factor_2'] == '0' \
-                and data['factor_3'] == '0'  and data['factor_4'] == '0' \
-                and data['factor_5'] == '0'  and data['factor_6'] == '0':
+                and data['factor_3'] == '0':
             errors.nutrient_1 = True
             errors.factor_1 = True
             has_errors = True
@@ -158,12 +115,18 @@ def nutrient_search(request):
         if data.has_key('search'):
             has_errors, errors = validate(data)
             if not has_errors:
+                url = "%s/" % data['food_group']
+                if data['nutrient_1'] != '-1':
+                    url += "%s/%s/" % (data['nutrient_1'], data['factor_1'])
+                if data['nutrient_2'] != '-1':
+                    url += "%s/%s/" % (data['nutrient_2'], data['factor_2'])
+                if data['nutrient_3'] != '-1':
+                    url += "%s/%s/" % (data['nutrient_3'], data['factor_3'])
                 save_nutrient_search_data_to_session(request.session, data)
-                return HttpResponseRedirect( '/nutrient_search_result/')
+                return HttpResponseRedirect( "/nutrient_search_result/%s" % url)
 
     else:
-        form = NutrientSearchForm({'factor_1':0, 'factor_2':0, 'factor_3':0, 'factor_4':0,
-                                   'factor_5':0, 'factor_6':0})
+        form = NutrientSearchForm({'factor_1':0, 'factor_2':0, 'factor_3':0})
         errors = FormErrors()
     return render_to_response( 'nutrient_search.html',{
             'form': form,

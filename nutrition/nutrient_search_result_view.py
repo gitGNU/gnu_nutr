@@ -44,10 +44,22 @@ class Nutrient_Score:
         self.values_list = values_list
         self.score = score
 
+def append_to_lists(nutr_id_list, factor_list, nutr, factor):
+    if nutr and factor:
+        try:
+            int_nutr = int(nutr)
+            float_factor = float(factor)
+            nutr_id_list.append(int_nutr)
+            factor_list.append(float_factor)
+        except ValueError:
+            pass
+    return nutr_id_list, factor_list
+
+
 @login_required
-def nutrient_search_result(request):
-    data = get_nutrient_search_data_from_session(request.session)
-    food_group = data['food_group']
+def nutrient_search_result(request, food_group=None, nutr1=None, fact1=None,
+                           nutr2=None, fact2=None,
+                           nutr3=None, fact3=None):
     nutr_name = Nutrient_Name()
     score_query = ''
     select_query = ''
@@ -57,36 +69,37 @@ def nutrient_search_result(request):
     rdi_dict = get_user_rdis_dict(request.user)
 
     nutr_id_list = []
-    for str in ['1', '2', '3', '4', '5', '6']:
-        if data['nutrient_%s' % str] != '-1':
-            nutr_id = data['nutrient_%s' % str]
-            int_nutr_id = int(nutr_id)
-            nutr_id_list.append(int_nutr_id)
-            scaling_factor = float(data['factor_%s' % str])
-            if int_nutr_id in rdi_dict and rdi_dict[int_nutr_id] != 0.0:
-                scaling_factor /= rdi_dict[int_nutr_id]
-            elif int_nutr_id in max_dict and max_dict[int_nutr_id] != 0.0:
-                scaling_factor /= max_dict[int_nutr_id]
-            if score_query != '':
-                score_query += ' + '
+    factor_list = []
 
-            score_query += "(value_%s * %f)" % (nutr_id, scaling_factor)
-            select_query += ", value_%s" % nutr_id
-            group_by = group_by + ", value_%s " % nutr_id
-            nutr_name.names.append(tracked_nutr_id_2_name_dict[int_nutr_id])
-            nutr_name.names.append('% RDI')
+    nutr_id_list, factor_list = append_to_lists(nutr_id_list, factor_list, nutr1, fact1)
+    nutr_id_list, factor_list = append_to_lists(nutr_id_list, factor_list, nutr2, fact2)
+    nutr_id_list, factor_list = append_to_lists(nutr_id_list, factor_list, nutr3, fact3)
+
+    if not nutr_id_list or not food_group:
+        return HttpResponseRedirect('/nutrient_search/')
+
+    for i, nutr_id in enumerate(nutr_id_list):
+        factor = factor_list[i]
+        if nutr_id in rdi_dict and rdi_dict[nutr_id] != 0.0:
+            factor /= rdi_dict[nutr_id]
+        elif int_nutr_id in max_dict and max_dict[nutr_id] != 0.0:
+            factor /= max_dict[nutr_id]
+        if score_query != '':
+            score_query += ' + '
+
+        score_query += "(value_%d * %f)" % (nutr_id, factor)
+        select_query += ", value_%d" % nutr_id
+        group_by = group_by + ", value_%d " % nutr_id
+        nutr_name.names.append(tracked_nutr_id_2_name_dict[nutr_id])
+        nutr_name.names.append('% RDI')
+
 
     if food_group == '0':
         query = "select food_id, food_name, max(" + score_query + ") as score" + select_query + " from nutrition_nutrient_score group by food_id, food_name " + group_by + "order by score desc limit 200;"
     else:
         query = "select food_id, food_name, max(" + score_query + ") as score" + select_query + " from nutrition_nutrient_score where group_id = '" + food_group + "' group by food_id, food_name " + group_by + "order by score desc limit 200;"
 
-    print 'query = ', query
     result = my_custom_sql(query)
-
-    print 'result = ', result
-    base_path = request.get_full_path()
-    print 'base_path = ', base_path
 
     scores = []
     for row in result:
@@ -94,16 +107,13 @@ def nutrient_search_result(request):
         name = row[1]
         score = row[2]
         values_list = []
-        for i in range(0, len(nutr_id_list)):
-            nutr_id = nutr_id_list[i]
+        for i, nutr_id in enumerate(nutr_id_list):
             if nutr_id in rdi_dict and rdi_dict[nutr_id] != 0.0:
                 percent_rdi = 100.0 * row[3 + i]/rdi_dict[nutr_id]
             else:
                 percent_rdi = "-"
             values_list.append(Values(row[3 + i], percent_rdi))
         scores.append(Nutrient_Score(food_id, name, score, values_list))
-
-    print 'scores = ', scores
 
     return render_to_response( 'nutrient_search_result.html',{
             "scores": scores,
