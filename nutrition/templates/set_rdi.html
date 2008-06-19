@@ -1,135 +1,144 @@
 {% extends "base.html" %}
 
 {% comment %}
-  web_nutrition: a web based nutrition and diet analysis program.
-  Copyright (C) 2008 Edgar Denny
+web_nutrition: a web based nutrition and diet analysis program.
+Copyright (C) 2008 Edgar Denny
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Affero General Public License as
-  published by the Free Software Foundation, either version 3 of the
-  License, or (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU Affero General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
 
-  You should have received a copy of the GNU Affero General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
 {% block title %}Set RDIs{% endblock %}
 
 {% block menu_set_rdi %}class="active"{% endblock %}
 
-{% block page_css %}<link rel="stylesheet" type="text/css" href="/site_media/styles/set_rdi.css" />{% endblock %}
+{% block page_css %}
+<link rel="stylesheet" type="text/css" href="/site_media/styles/ui.tabs.css" />
+<link rel="stylesheet" type="text/css" href="/site_media/styles/set_rdi.css" />
+{% endblock %}
+
+{% block page_javascript %}
+<script type="text/javascript" src="/site_media/javascript/jquery-1.2.3.js"></script>
+<script type="text/javascript" src="/site_media/javascript/ui.core.js"></script>
+<script type="text/javascript" src="/site_media/javascript/ui.tabs.js"></script>
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+  $("#tabs > ul").tabs();
+  });
+</script>
+{% endblock %}
 
 {% block content %}
 <form action="." method="POST">
-
-  <div id="nav">
-    <ul>
-      <li><a title="macro" href="#">Macro Nutrients</a></li>
-      <li><a title="vitamins" href="#">Vitamins</a></li>
-      <li><a title="minerals" href="#">Minerals</a></li>
-      <li><a title="aminos" href="#">Amino Acids</a></li>
-      <li><a title="fats" href="#">Fats</a></li>
-    </ul>
+<div id="tabs">
+  <ul>
+    <li><a href="#macro"><span>Macro Nutrients</span></a></li>
+    <li><a href="#vitamins"><span>Vitamins</span></a></li>
+    <li><a href="#minerals"><span>Minerals</span></a></li>
+    <li><a href="#aminos"><span>Amino Acids</span></a></li>
+    <li><a href="#fats"><span>Fats</span></a></li>
+  </ul>
+  <div id="macro">
+    <table>
+      <tr>
+        <th colspan="1">Nutrient</th>
+        <th>Minimum Value</th>
+        <th>Maximum Value</th>
+      </tr>
+      {% for nutr in nutrients.general %}
+      <tr>
+        <td class="first">{{ nutr.name }} ({{ nutr.unit_of_measure }})</td>
+        <td>{{ nutr.min|escape }}
+          {% if nutr.min.errors %}<span class="errors">*</span>{% endif %}</td>
+        <td>{{ nutr.max|escape }}
+          {% if nutr.max.errors %}<span class="errors">*</span>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </table>
   </div>
-<div id="rdi-tabs">
-  <div id="tabs">
-    <div id="macro">
-      <table>
-        <tr>
-          <th colspan="1">Nutrient</th>
-          <th>Minimum Value</th>
-          <th>Maximum Value</th>
-        </tr>
-        {% for nutr in nutrients.general %}
-          <tr>
-            <td class="first">{{ nutr.name }} ({{ nutr.unit_of_measure }})</td>
-            <td>{{ nutr.min|escape }}
-              {% if nutr.min.errors %}<span class="errors">*</span>{% endif %}</td>
-            <td>{{ nutr.max|escape }}
-              {% if nutr.max.errors %}<span class="errors">*</span>{% endif %}</td>
-          </tr>
-        {% endfor %}
-      </table>
-    </div>
-    <div id="vitamins">
-      <table>
-        <tr>
-          <th colspan="1">Nutrient</th>
-          <th>Minimum Value</th>
-          <th>Maximum Value</th>
-        </tr>
-        {% for nutr in nutrients.vitamins %}
-          <tr>
-            <td class="first">{{ nutr.name }} ({{ nutr.unit_of_measure }})</td>
-            <td>{{ nutr.min|escape }}
-              {% if nutr.min.errors %}<span class="errors">*</span>{% endif %}</td>
-            <td>{{ nutr.max|escape }}
-              {% if nutr.max.errors %}<span class="errors">*</span>{% endif %}</td>
-          </tr>
-        {% endfor %}
-      </table>
-    </div>
-    <div id="minerals">
-      <table>
-        <tr>
-          <th colspan="1">Nutrient</th>
-          <th>Minimum Value</th>
-          <th>Maximum Value</th>
-        </tr>
-        {% for nutr in nutrients.minerals %}
-          <tr>
-            <td class="first">{{ nutr.name }} ({{ nutr.unit_of_measure }})</td>
-            <td>{{ nutr.min|escape }}
-              {% if nutr.min.errors %}<span class="errors">*</span>{% endif %}</td>
-            <td>{{ nutr.max|escape }}
-              {% if nutr.max.errors %}<span class="errors">*</span>{% endif %}</td>
-          </tr>
-        {% endfor %}
-      </table>
-    </div>
-    <div id="aminos">
-      <table>
-        <tr>
-          <th colspan="1">Nutrient</th>
-          <th>Minimum Value</th>
-          <th>Maximum Value</th>
-        </tr>
-        {% for nutr in nutrients.amino_acids %}
-          <tr>
-            <td class="first">{{ nutr.name }} ({{ nutr.unit_of_measure }})</td>
-            <td>{{ nutr.min|escape }}
-              {% if nutr.min.errors %}<span class="errors">*</span>{% endif %}</td>
-            <td>{{ nutr.max|escape }}
-              {% if nutr.max.errors %}<span class="errors">*</span>{% endif %}</td>
-          </tr>
-        {% endfor %}
-      </table>
-    </div>
-    <div id="fats">
-      <table>
-        <tr>
-          <th colspan="1">Nutrient</th>
-          <th>Minimum Value</th>
-          <th>Maximum Value</th>
-        </tr>
-        {% for nutr in nutrients.fats %}
-          <tr>
-            <td class="first">{{ nutr.name }} ({{ nutr.unit_of_measure }})</td>
-            <td>{{ nutr.min|escape }}
-              {% if nutr.min.errors %}<span class="errors">*</span>{% endif %}</td>
-            <td>{{ nutr.max|escape }}
-              {% if nutr.max.errors %}<span class="errors">*</span>{% endif %}</td>
-          </tr>
-        {% endfor %}
-      </table>
-    </div>
+  <div id="vitamins">
+    <table>
+      <tr>
+        <th colspan="1">Nutrient</th>
+        <th>Minimum Value</th>
+        <th>Maximum Value</th>
+      </tr>
+      {% for nutr in nutrients.vitamins %}
+      <tr>
+        <td class="first">{{ nutr.name }} ({{ nutr.unit_of_measure }})</td>
+        <td>{{ nutr.min|escape }}
+          {% if nutr.min.errors %}<span class="errors">*</span>{% endif %}</td>
+        <td>{{ nutr.max|escape }}
+          {% if nutr.max.errors %}<span class="errors">*</span>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </table>
   </div>
+  <div id="minerals">
+    <table>
+      <tr>
+        <th colspan="1">Nutrient</th>
+        <th>Minimum Value</th>
+        <th>Maximum Value</th>
+      </tr>
+      {% for nutr in nutrients.minerals %}
+      <tr>
+        <td class="first">{{ nutr.name }} ({{ nutr.unit_of_measure }})</td>
+        <td>{{ nutr.min|escape }}
+          {% if nutr.min.errors %}<span class="errors">*</span>{% endif %}</td>
+        <td>{{ nutr.max|escape }}
+          {% if nutr.max.errors %}<span class="errors">*</span>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <div id="aminos">
+    <table>
+      <tr>
+        <th colspan="1">Nutrient</th>
+        <th>Minimum Value</th>
+        <th>Maximum Value</th>
+      </tr>
+      {% for nutr in nutrients.amino_acids %}
+      <tr>
+        <td class="first">{{ nutr.name }} ({{ nutr.unit_of_measure }})</td>
+        <td>{{ nutr.min|escape }}
+          {% if nutr.min.errors %}<span class="errors">*</span>{% endif %}</td>
+        <td>{{ nutr.max|escape }}
+          {% if nutr.max.errors %}<span class="errors">*</span>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <div id="fats">
+    <table>
+      <tr>
+        <th colspan="1">Nutrient</th>
+        <th>Minimum Value</th>
+        <th>Maximum Value</th>
+      </tr>
+      {% for nutr in nutrients.fats %}
+      <tr>
+        <td class="first">{{ nutr.name }} ({{ nutr.unit_of_measure }})</td>
+        <td>{{ nutr.min|escape }}
+          {% if nutr.min.errors %}<span class="errors">*</span>{% endif %}</td>
+        <td>{{ nutr.max|escape }}
+          {% if nutr.max.errors %}<span class="errors">*</span>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+    <input type="submit" name="save" value="Save Changes" />
 </div>
-  <input type="submit" name="save" value="Save Changes" />
 </form>
 {% endblock %}

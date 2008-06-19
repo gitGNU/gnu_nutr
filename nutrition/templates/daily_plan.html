@@ -1,249 +1,249 @@
 {% extends "base.html" %}
 
 {% comment %}
-  web_nutrition: a web based nutrition and diet analysis program.
-  Copyright (C) 2008 Edgar Denny
+web_nutrition: a web based nutrition and diet analysis program.
+Copyright (C) 2008 Edgar Denny
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Affero General Public License as
-  published by the Free Software Foundation, either version 3 of the
-  License, or (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU Affero General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
 
-  You should have received a copy of the GNU Affero General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
 {% block title %}Daily Plan{% endblock %}
 
 {% block menu_daily_plan %}class="active"{% endblock %}
 
-{% block page_css %}<link rel="stylesheet" type="text/css" href="/site_media/styles/plan.css" />
-<link rel="stylesheet" type="text/css" href="/site_media/styles/ui.datepicker.css" />{% endblock %}
+{% block page_css %}
+<link rel="stylesheet" type="text/css" href="/site_media/styles/plan.css" />
+<link rel="stylesheet" type="text/css" href="/site_media/styles/ui.tabs.css" />
+<link rel="stylesheet" type="text/css" href="/site_media/styles/ui.datepicker.css" />
+{% endblock %}
+
+{% block page_javascript %}
+<script type="text/javascript" src="/site_media/javascript/jquery-1.2.3.js"></script>
+<script type="text/javascript" src="/site_media/javascript/ui.core.js"></script>
+<script type="text/javascript" src="/site_media/javascript/ui.tabs.js"></script>
+<script type="text/javascript" src="/site_media/javascript/ui.datepicker.js"></script>
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function(){
+  $("#id_copy_date").datepicker({dayNamesMin: ['S','M','T','W','T','F','S'], mandatory: true, speed: 'fast', changeMonth: false, dateFormat: 'yy/m/d', buttonText: 'Choose', showOn:'button', buttonImage: '/site_media/images/calendar.gif', buttonImageOnly: true});
+
+  $("#ui-datepicker").datepicker({
+  changeFirstDay: false,
+  dayNamesMin: ['S','M','T','W','T','F','S'],
+  dateFormat: 'yy/m/d',
+  onSelect: goToPage});
+
+  function goToPage(dateStr) {
+  window.location = '/daily_plan/' + dateStr;
+  }
+
+  $("#tabs > ul").tabs();
+  });
+</script>
+{% endblock %}
 
 {% block calendar %}
-  <div id="calendar">
-  <table id="cal-table">
-    <tr id="year_row">
-      <td colspan="1"><a class="year" href="/daily_plan/{{ cal.prev_year }}/{{ cal.month }}/1">&lt;&lt;</a></th>
-      <td id="year_date" colspan="5">{{ cal.year|escape }}</th>
-      <td colspan="1"><a class="year" href="/daily_plan/{{ cal.next_year }}/{{ cal.month }}/1">&gt;&gt;</a></th>
-    </tr>
-    <tr id="month_row">
-      <td colspan="1"><a class="month" href="/daily_plan/{{ cal.year }}/{{ cal.prev_month }}/1">&lt;</a></th>
-      <td id="month_date" colspan="5">{{ cal.month_name|escape }}</th>
-      <td colspan="1"><a class="month" href="/daily_plan/{{ cal.year }}/{{ cal.next_month }}/1">&gt;</a></th>
-    </tr>
-    <tr id="day_row">
-      {% for day_name in cal.day_names %}
-        <td class="day_name">{{ day_name }}</td>
-      {% endfor %}
-    </tr>
-    {% for week in cal.calendar_rows %}
-    <tr>
-      {% for day in week %}
-        {% ifequal day 0 %}
-          <td></td>
-        {% else %}
-          {% ifequal day cal.day %}
-            <td><a class="active-day" href="/daily_plan/{{ cal.year }}/{{ cal.month }}/{{ day }}">{{ day|escape }}</a></td>
-          {% else %}
-            <td><a class="day" href="/daily_plan/{{ cal.year }}/{{ cal.month }}/{{ day }}">{{ day|escape }}</a></td>
-          {% endifequal %}
-        {% endifequal %}
-      {% endfor %}
-    </tr>
-    {% endfor %}
-  </table>
-  </div>
+<div id="ui-datepicker"></div>
 {% endblock %}
 
 {% block content %}
 
+<form action="/daily_plan/{{ cal.year }}/{{ cal.month }}/{{ cal.day }}/" method="POST">
+  {% ifequal save_result 0 %}
+  <p>Cannot Save: correct entries highlighted with '*'</p>
+  {% endifequal %}
+
   <h1>Daily Plan : {{ cal.year }}/{{ cal.month }}/{{ cal.day }}</h1>
-  <form action="/daily_plan/{{ cal.year }}/{{ cal.month }}/{{ cal.day }}/" method="POST">
-    {% ifequal save_result 0 %}
-      <p>Cannot Save: correct entries highlighted with '*'</p>
-    {% endifequal %}
-    <div id="plan-form-container">
-      <table border="1">
-        <tr>
-          <th class="first"></th>
-          <th class="second">Amount</th>
-          <th class="third">Measure</th>
-          <th class="fourth">Name</th>
-          <th class="fifth">Calories</th>
-        </tr>
-        {% for item in plan_list %}
-        <tr>
-          <td class="first">{{ item.check|escape }}
-            {% if item.check.errors %}<span class="errors">*</span>{% endif %}
-          </td>
-          <td class="second">{{ item.num_measures|escape }}
-            {% if item.num_measures.errors %}<span class="errors">*</span>{% endif %}
-          </td>
-          <td class="third">
-            {% ifequal item.item_type "food" %}
-            {{ item.measure|escape }}
-            {% if item.measure.errors %}<span class="errors">*</span>{% endif %}
-            {% else %}
-            1 serving
-            {% endifequal %}
-          </td>
-          <td class="fouth">
-            {% ifequal item.item_type "food" %}
-            <a id="odd" href="/food_search/food_id/{{ item.item_id }}/measure/{{ item.measure_str }}/num_measures/{{ item.amount }}">{{ item.name_str }}</a>
-            {% else %}
-            <a id="odd" href="/search_recipe/recipe_id/{{ item.item_id }}">{{ item.name_str }}</a>
-            {% endifequal %}
-            {% if item.name.errors %}<span class="errors">*</span>{% endif %}
-          </td>
-          <td class="fifth">
-            {{ item.calories }}
-          </td>
-        </tr>
-        {% endfor %}
-        {% for item in filler_list %}
-          <tr><td></td><td></td><td></td><td></td><td></td></tr>
-        {% endfor %}
-      </table>
-      <div id="plan-form-buttons">
-        <input type="submit" name="refresh" value="Re-Calculate">
-        <input type="submit" name="add_recipe" value="Add Recipe">
-        <input type="submit" name="add_food" value="Add Food">
-        <input type="submit" name="delete" value="Delete Checked">
-        <input type="submit" name="save" value="Save Plan">
-      </div>
-    </div>
-  </form>
 
-  {% if nutrients.general %}
+  <label id="date_label" for="id_copy_date" class="labelclass">Copy Plan from Date :</label>
 
-  <div id="nav">
-    <ul>
-      <li><a title="macro" href="#">Macro Nutrients</a></li>
-      <li><a title="vitamins" href="#">Vitamins</a></li>
-      <li><a title="minerals" href="#">Minerals</a></li>
-      <li><a title="aminos" href="#">Amino Acids</a></li>
-      <li><a title="fats" href="#">Fats</a></li>
-    </ul>
-  </div>
-  <div id="tabs">
-    <div id="macro">
-      <table>
-        <tr>
-          <th>Nutrient</th>
-          <th colspan="2">Value</th>
-          <th colspan="2">% DV</th>
-        </tr>
-        {% for n in nutrients.general %}
-        <tr>
-          <td>{{ n.nutr_desc }}</td>
-          <td class="right">{{ n.nutr_value|stringformat:".2f" }}</td>
-          <td class="left">{{ n.unit_of_measure }}</td>
-          <td class="right">{{ n.percent_rdi|stringformat:".1f" }}</td>
-          <td class="graph">
-            <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
-            {{ n.percent_rdi|stringformat:".1f" }}%
-            </span>
-          </td>
-        </tr>
-        {% endfor %}
-      </table>
-    </div>
-    <div id="vitamins">
-      <table>
-        <tr>
-          <th>Nutrient</th>
-          <th colspan="2">Value</th>
-          <th colspan="2">% DV</th>
-        </tr>
-        {% for n in nutrients.vitamins %}
-        <tr>
-          <td>{{ n.nutr_desc }}</td>
-          <td class="right">{{ n.nutr_value|stringformat:".2f" }}</td>
-          <td class="left">{{ n.unit_of_measure }}</td>
-          <td class="right">{{ n.percent_rdi|stringformat:".1f" }}</td>
-          <td class="graph">
-            <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
-            {{ n.percent_rdi|stringformat:".1f" }}%
-            </span>
-          </td>
-        </tr>
-        {% endfor %}
-      </table>
-    </div>
-    <div id="minerals">
-      <table>
-        <tr>
-          <th>Nutrient</th>
-          <th colspan="2">Value</th>
-          <th colspan="2">% DV</th>
-        </tr>
-        {% for n in nutrients.minerals %}
-        <tr>
-          <td>{{ n.nutr_desc }}</td>
-          <td class="right">{{ n.nutr_value|stringformat:".2f" }}</td>
-          <td class="left">{{ n.unit_of_measure }}</td>
-          <td class="right">{{ n.percent_rdi|stringformat:".1f" }}</td>
-          <td class="graph">
-            <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
-            {{ n.percent_rdi|stringformat:".1f" }}%
-            </span>
-          </td>
-        </tr>
-        {% endfor %}
-      </table>
-    </div>
-    <div id="aminos">
-      <table>
-        <tr>
-          <th>Nutrient</th>
-          <th colspan="2">Value</th>
-          <th colspan="2">% DV</th>
-        </tr>
-        {% for n in nutrients.amino_acids %}
-        <tr>
-          <td>{{ n.nutr_desc }}</td>
-          <td class="right">{{ n.nutr_value|stringformat:".2f" }}</td>
-          <td class="left">{{ n.unit_of_measure }}</td>
-          <td class="right">{{ n.percent_rdi|stringformat:".1f" }}</td>
-          <td class="graph">
-            <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
-            {{ n.percent_rdi|stringformat:".1f" }}%
-            </span>
-          </td>
-        </tr>
-        {% endfor %}
-      </table>
-    </div>
-    <div id="fats">
-      <table>
-        <tr>
-          <th>Nutrient</th>
-          <th colspan="2">Value</th>
-          <th colspan="2">% DV</th>
-        </tr>
-        {% for n in nutrients.fats %}
-        <tr>
-          <td>{{ n.nutr_desc }}</td>
-          <td class="right">{{ n.nutr_value|stringformat:".2f" }}</td>
-          <td class="left">{{ n.unit_of_measure }}</td>
-          <td class="right">{{ n.percent_rdi|stringformat:".1f" }}</td>
-          <td class="graph">
-            <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
-            {{ n.percent_rdi|stringformat:".1f" }}%
-            </span>
-          </td>
-        </tr>
-        {% endfor %}
-      </table>
+  {{ copy_date_form.copy_date }}
+
+  <input type="submit" name="copy_plan" value="Copy Plan" />
+
+  <div id="plan-form-container">
+    <table border="1">
+      <tr>
+        <th class="first"></th>
+        <th class="second">Amount</th>
+        <th class="third">Measure</th>
+        <th class="fourth">Name</th>
+        <th class="fifth">Calories</th>
+      </tr>
+      {% for item in plan_list %}
+      <tr>
+        <td class="first">{{ item.check|escape }}
+          {% if item.check.errors %}<span class="errors">*</span>{% endif %}
+        </td>
+        <td class="second">{{ item.num_measures|escape }}
+          {% if item.num_measures.errors %}<span class="errors">*</span>{% endif %}
+        </td>
+        <td class="third">
+          {% ifequal item.item_type "food" %}
+          {{ item.measure|escape }}
+          {% if item.measure.errors %}<span class="errors">*</span>{% endif %}
+          {% else %}
+          1 serving
+          {% endifequal %}
+        </td>
+        <td class="fouth">
+          {% ifequal item.item_type "food" %}
+          <a id="odd" href="/food_search/food_id/{{ item.item_id }}/measure/{{ item.measure_str }}/num_measures/{{ item.amount }}">{{ item.name_str }}</a>
+          {% else %}
+          <a id="odd" href="/search_recipe/recipe_id/{{ item.item_id }}">{{ item.name_str }}</a>
+          {% endifequal %}
+          {% if item.name.errors %}<span class="errors">*</span>{% endif %}
+        </td>
+        <td class="fifth">
+          {{ item.calories }}
+        </td>
+      </tr>
+      {% endfor %}
+      {% for item in filler_list %}
+      <tr><td></td><td></td><td></td><td></td><td></td></tr>
+      {% endfor %}
+    </table>
+    <div id="plan-form-buttons">
+      <input type="submit" name="refresh" value="Re-Calculate" />
+      <input type="submit" name="add_recipe" value="Add Recipe" />
+      <input type="submit" name="add_food" value="Add Food" />
+      <input type="submit" name="delete" value="Delete Checked" />
+      <input type="submit" name="save" value="Save Plan" />
     </div>
   </div>
+</form>
 
-  {% endif %}
+{% if nutrients.general %}
+
+<div id="tabs">
+  <ul>
+    <li><a href="#macro"><span>Macro Nutrients</span></a></li>
+    <li><a href="#vitamins"><span>Vitamins</span></a></li>
+    <li><a href="#minerals"><span>Minerals</span></a></li>
+    <li><a href="#aminos"><span>Amino Acids</span></a></li>
+    <li><a href="#fats"><span>Fats</span></a></li>
+  </ul>
+  <div id="macro">
+    <table>
+      <tr>
+        <th>Nutrient</th>
+        <th colspan="2">Value</th>
+        <th colspan="2">% DV</th>
+      </tr>
+      {% for n in nutrients.general %}
+      <tr>
+        <td>{{ n.nutr_desc }}</td>
+        <td class="right">{{ n.nutr_value|stringformat:".2f" }}</td>
+        <td class="left">{{ n.unit_of_measure }}</td>
+        <td class="right">{{ n.percent_rdi|stringformat:".1f" }}</td>
+        <td class="graph">
+          <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
+            {{ n.percent_rdi|stringformat:".1f" }}%
+          </span>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <div id="vitamins">
+    <table>
+      <tr>
+        <th>Nutrient</th>
+        <th colspan="2">Value</th>
+        <th colspan="2">% DV</th>
+      </tr>
+      {% for n in nutrients.vitamins %}
+      <tr>
+        <td>{{ n.nutr_desc }}</td>
+        <td class="right">{{ n.nutr_value|stringformat:".2f" }}</td>
+        <td class="left">{{ n.unit_of_measure }}</td>
+        <td class="right">{{ n.percent_rdi|stringformat:".1f" }}</td>
+        <td class="graph">
+          <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
+            {{ n.percent_rdi|stringformat:".1f" }}%
+          </span>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <div id="minerals">
+    <table>
+      <tr>
+        <th>Nutrient</th>
+        <th colspan="2">Value</th>
+        <th colspan="2">% DV</th>
+      </tr>
+      {% for n in nutrients.minerals %}
+      <tr>
+        <td>{{ n.nutr_desc }}</td>
+        <td class="right">{{ n.nutr_value|stringformat:".2f" }}</td>
+        <td class="left">{{ n.unit_of_measure }}</td>
+        <td class="right">{{ n.percent_rdi|stringformat:".1f" }}</td>
+        <td class="graph">
+          <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
+            {{ n.percent_rdi|stringformat:".1f" }}%
+          </span>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <div id="aminos">
+    <table>
+      <tr>
+        <th>Nutrient</th>
+        <th colspan="2">Value</th>
+        <th colspan="2">% DV</th>
+      </tr>
+      {% for n in nutrients.amino_acids %}
+      <tr>
+        <td>{{ n.nutr_desc }}</td>
+        <td class="right">{{ n.nutr_value|stringformat:".2f" }}</td>
+        <td class="left">{{ n.unit_of_measure }}</td>
+        <td class="right">{{ n.percent_rdi|stringformat:".1f" }}</td>
+        <td class="graph">
+          <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
+            {{ n.percent_rdi|stringformat:".1f" }}%
+          </span>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <div id="fats">
+    <table>
+      <tr>
+        <th>Nutrient</th>
+        <th colspan="2">Value</th>
+        <th colspan="2">% DV</th>
+      </tr>
+      {% for n in nutrients.fats %}
+      <tr>
+        <td>{{ n.nutr_desc }}</td>
+        <td class="right">{{ n.nutr_value|stringformat:".2f" }}</td>
+        <td class="left">{{ n.unit_of_measure }}</td>
+        <td class="right">{{ n.percent_rdi|stringformat:".1f" }}</td>
+        <td class="graph">
+          <span id="bar" style="width: {{ n.width|stringformat:".1f" }}%;">
+            {{ n.percent_rdi|stringformat:".1f" }}%
+          </span>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+
+{% endif %}
 {% endblock %}

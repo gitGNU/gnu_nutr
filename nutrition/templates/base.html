@@ -1,65 +1,68 @@
 {% comment %}
-  web_nutrition: a web based nutrition and diet analysis program.
-  Copyright (C) 2008 Edgar Denny
+web_nutrition: a web based nutrition and diet analysis program.
+Copyright (C) 2008 Edgar Denny
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Affero General Public License as
-  published by the Free Software Foundation, either version 3 of the
-  License, or (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU Affero General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
 
-  You should have received a copy of the GNU Affero General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html lang="en">
-<head>
+  <head>
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" type="text/css" href="/site_media/styles/base.css" />
     {% block page_css %}{% endblock %}
-    <script type="text/javascript" src="/site_media/javascript/jquery-1.2.3.js"></script>
-    <script type="text/javascript" src="/site_media/javascript/tabs.js"></script>
-    <script type="text/javascript" src="/site_media/javascript/ui.datepicker.js"></script>
-<script type="text/javascript" charset="utf-8">
-                        jQuery(function($){
-                        $("#dateinput").datepicker({dayNamesMin: ['S','M','T','W','T','F','S'], firstDay: 1, mandatory: true, speed: 'fast', changeMonth: false, dateFormat: 'yy/m/d'});
-                        });
-                </script>
-</head>
+    {% block page_javascript %}{% endblock %}
+  </head>
 
-<body>
-  <div id="container">
-    <div id="header">
-      <h1>Web Nutrition</h1>
-    </div>
-    <div id="left-hs">
-      <div id="menu">
-        <h4>Navigation</h4>
-        <a id="login" {% block menu_login %}{% endblock %} href="/accounts/login/?next=/menu/">Login</a>
-        <a id="register" {% block menu_register %}{% endblock %} href="/register/">New User</a>
-        <a id="set_rdi" {% block menu_set_rdi %}{% endblock %} href="/set_rdi/">Set Personal RDIs</a>
-        <a id="food_search" {% block menu_food_search %}{% endblock %} href="/food_search/">Food Search</a>
-        <a id="nutrient_search" {% block menu_nutrient_search %}{% endblock %} href="/nutrient_search/">Nutrient Search</a>
-        <a id="create_recipe" {% block menu_create_recipe %}{% endblock %} href="/create_recipe/">Create Recipe</a>
-        <a id="search_recipe" {% block menu_search_recipe %}{% endblock %} href="/search_recipe/">Recipe Search</a>
-        <a id="edit_recipe" {% block menu_edit_recipe %}{% endblock %} href="/search_edit_recipe/">Edit Recipe</a>
-        <a id="daily plan" {% block menu_daily_plan %}{% endblock %} href="/daily_plan/">Daily Plan</a>
+  <body>
+    <div id="container">
+      <div id="header">
+        <h1>Web Nutrition</h1>
       </div>
-      {% block calendar %}
-      {% endblock %}
+
+      <div class="colmask leftmenu">
+        <div class="colright">
+          <div class="col1wrap">
+            <div class="right-hs">
+              <div id="content">
+                {% block content %}
+                {% endblock %}
+              </div>
+            </div>
+          </div>
+
+          <div class="left-hs">
+            <div id="menu">
+              <h4>Navigation</h4>
+              <a id="login" {% block menu_login %}{% endblock %} href="/accounts/login/?next=/menu/">Login</a>
+              <a id="register" {% block menu_register %}{% endblock %} href="/register/">New User</a>
+              <a id="set_rdi" {% block menu_set_rdi %}{% endblock %} href="/set_rdi/">Set Personal RDIs</a>
+              <a id="food_search" {% block menu_food_search %}{% endblock %} href="/food_search/">Food Search</a>
+              <a id="nutrient_search" {% block menu_nutrient_search %}{% endblock %} href="/nutrient_search/">Nutrient Search</a>
+              <a id="create_recipe" {% block menu_create_recipe %}{% endblock %} href="/create_recipe/">Create Recipe</a>
+              <a id="search_recipe" {% block menu_search_recipe %}{% endblock %} href="/search_recipe/">Recipe Search</a>
+              <a id="edit_recipe" {% block menu_edit_recipe %}{% endblock %} href="/search_edit_recipe/">Edit Recipe</a>
+              <a id="daily plan" {% block menu_daily_plan %}{% endblock %} href="/daily_plan/">Daily Plan</a>
+            </div>
+            {% block calendar %}
+            {% endblock %}
+          </div>
+        </div>
+      </div>
+      <div id="footer">
+        <h5>Edgar Denny</h5>
+      </div>
     </div>
-    <div id="content">
-      {% block content %}
-      {% endblock %}
-    </div>
-    <div id="footer">
-      <h5>Edgar Denny</h5>
-    </div>
-  </div>
-</body>
+  </body>
 </html>

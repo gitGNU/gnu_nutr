@@ -22,7 +22,21 @@
 
 {% block menu_create_recipe %}class="active"{% endblock %}
 
-{% block page_css %}<link rel="stylesheet" type="text/css" href="/site_media/styles/create_recipe.css" />{% endblock %}
+{% block page_css %}
+  <link rel="stylesheet" type="text/css" href="/site_media/styles/ui.tabs.css" />
+  <link rel="stylesheet" type="text/css" href="/site_media/styles/create_recipe.css" />
+{% endblock %}
+
+{% block page_javascript %}
+  <script type="text/javascript" src="/site_media/javascript/jquery-1.2.3.js"></script>
+  <script type="text/javascript" src="/site_media/javascript/ui.core.js"></script>
+  <script type="text/javascript" src="/site_media/javascript/ui.tabs.js"></script>
+  <script type="text/javascript" charset="utf-8">
+  $(document).ready(function(){
+    $("#tabs > ul").tabs();
+  });
+</script>
+{% endblock %}
 
 {% block content %}
 
@@ -85,16 +99,14 @@
 
   {% if nutrients.general %}
 
-  <div id="nav">
-    <ul>
-      <li><a title="macro" href="#">Macro Nutrients</a></li>
-      <li><a title="vitamins" href="#">Vitamins</a></li>
-      <li><a title="minerals" href="#">Minerals</a></li>
-      <li><a title="aminos" href="#">Amino Acids</a></li>
-      <li><a title="fats" href="#">Fats</a></li>
-    </ul>
-  </div>
   <div id="tabs">
+    <ul>
+      <li><a href="#macro"><span>Macro Nutrients</span></a></li>
+      <li><a href="#vitamins"><span>Vitamins</span></a></li>
+      <li><a href="#minerals"><span>Minerals</span></a></li>
+      <li><a href="#aminos"><span>Amino Acids</span></a></li>
+      <li><a href="#fats"><span>Fats</span></a></li>
+    </ul>
     <div id="macro">
       <table>
         <tr>

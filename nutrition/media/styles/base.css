@@ -1,3 +1,19 @@
+/* web_nutrition: a web based nutrition and diet analysis program. */
+/* Copyright (C) 2008 Edgar Denny */
+
+/* This program is free software: you can redistribute it and/or modify */
+/* it under the terms of the GNU Affero General Public License as */
+/* published by the Free Software Foundation, either version 3 of the */
+/* License, or (at your option) any later version. */
+
+/* This program is distributed in the hope that it will be useful, */
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the */
+/* GNU Affero General Public License for more details. */
+
+/* You should have received a copy of the GNU Affero General Public License */
+/* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 html {
   background-color: white;
   color: #000;
@@ -88,17 +104,48 @@ div#header h1
   margin: 0;
 }
 
-div#left-hs
-{
+.colmask {
+  position: relative;  /* This fixes the IE7 overflow hidden bug and stops the layout jumping out of place */
+  clear: both;
   float: left;
-  padding: 0;
-  width: 16em;
-  margin: 0;
-  background-color: #fff;
-/*   border-right: 1px solid gray; */
+  width: 100%;       /* width of whole page */
+  overflow: hidden;  /* This chops off any overhanging divs */
 }
 
-div#left-hs h4
+.leftmenu {
+  background: #cfc;
+}
+
+.leftmenu .colright {
+  float: left;
+  width: 200%;
+  position: relative;
+  left: 16em;
+  background: #fff;
+}
+.leftmenu .col1wrap {
+  float: right;
+  width: 50%;
+  position:relative;
+  right: 16em;
+  padding-bottom: 1em;
+}
+
+.leftmenu .right-hs {
+  margin:0 1em 0 17em;
+  position:relative;
+  right:100%;
+  overflow:hidden;
+}
+
+.leftmenu .left-hs {
+  float: left;
+  width: 16em;
+  position: relative;
+  right: 16em;
+}
+
+.left-hs div#menu h4
 {
   padding: 0;
   margin: 2px 0 2px 2px;
@@ -108,7 +155,7 @@ div#left-hs h4
   font-weight: bold;
 }
 
-div#left-hs a
+.left-hs div#menu a
 {
   text-decoration: none;
   font-weight: bold;
@@ -121,27 +168,20 @@ div#left-hs a
   text-indent: 2em;
 }
 
-div#left-hs a.active
+.left-hs div#menu a.active
 {
   background: #A9A9A9;
 }
 
-div#left-hs a:hover
+.left-hs div#menu a:hover
 {
   text-decoration: underline;
   background: #ddd;
 }
 
-div#left-hs a:visited
+.left-hs div#menu a:visited
 {
   color: #0000FF;
-}
-
-div#content
-{
-  margin-left: 16em;
-  padding: 1em;
-  background-color: #fff;
 }
 
 div#footer
@@ -155,67 +195,6 @@ div#footer h5
 {
   padding: 1em;
   margin: 0;
-}
-
-#nav
-{
-  margin: 0;
-  padding: 0;
-}
-
-#nav
-{
-  margin: 0;
-  padding: 0;
-}
-
-#nav ul
-{
-  margin: 0;
-  padding: 0;
-  border: 0;
-  margin-bottom: -1px;
-}
-
-#nav li
-{
-  display: inline;
-  overflow: hidden;
-  border: 0;
-  margin: 0;
-  padding: 0;
-}
-
-#nav a, a.activetab
-{
-  color: #000;
-  background: #ddd;
-  border: 1px solid black;
-  padding: 2px 5px 0px 5px;
-  margin: 0;
-  text-decoration: none;
-}
-
-#nav a.activetab
-{
-  background: #fff;
-  border-bottom: 1px solid #fff;
-}
-
-#nav a:hover
-{
-  background: #F0F8FF;
-}
-
-#tabs
-{
-  padding: 1em;
-  border: 1px solid black;
-}
-
-#tabs table
-{
-  width: 100%;
 }
 
 .graph {
@@ -236,7 +215,7 @@ div#footer h5
   line-height: 1em;
 }
 
-table
+div#content table
 {
   border-color: #000;
   border-width: 0px 0px 1px 1px;
@@ -245,7 +224,7 @@ table
   width: 100%;
 }
 
-th
+div#content th
 {
   border-color: #000;
   border-width: 1px 1px 2px 0px;
@@ -255,7 +234,7 @@ th
   text-align: left;
 }
 
-td
+div#content td
 {
   border-color: #000;
   border-width: 1px 1px 0px 0px;
@@ -266,36 +245,54 @@ td
   text-align: left;
 }
 
-td.left {
+div#content td.left {
   text-align: left;
   padding-left: 0.5em;
   border-left-width: 0px;
 }
 
-td.right {
+div#content td.right {
   text-align: right;
   border-width: 1px 0px 0px 0px;
   padding-right: 0em;
 }
 
-td.first
+div#content td.first
 {
   padding: 0px;
 }
 
-td.second, td.second input, td.third
+div#content td.second, div#content td.second input, div#content td.third
 {
   width: 5em;
   padding: 2px;
 }
 
-td.third select
+div#content td.third select
 {
   width: 17em;
 }
 
-.fourth
+div#content .fourth
 {
   width: 100%;
   padding-left: 1em;
 }
+
+/* ---------------------------------------------------------------
+Clearfix
+--------------------------------------------------------------- */
+.clearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+.clearfix {display: inline-block;}
+
+/* Hides from IE-mac \*/
+* html .clearfix {height: 1%;}
+.clearfix {display: block;}
+/* End hide from IE-mac */

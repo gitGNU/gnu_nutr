@@ -42,6 +42,9 @@ class PlanRecipeForm(forms.Form):
     num_measures = forms.DecimalField(required=True)
     measure = forms.CharField(widget=forms.TextInput(attrs={'readonly':''}))
 
+class PlanCopyDate(forms.Form):
+    copy_date = forms.DateField(input_formats=['%Y/%m/%d'], widget=forms.TextInput(attrs={'style':'width:10em'}))
+
 def abbreviated_days():
     day_list = [];
     for day in day_abbr:
@@ -294,28 +297,24 @@ def daily_plan(request, year=None, month=None, day=None, food_id=None, recipe_id
                 plan_form_list.append(new_form)
                 save_plan_to_database(request.user, plan_form_list, year, month, day)
     else:
-#         if request.GET:
-#             data = request.GET.copy()
-#             clone_date_string = data['clone_date']
-#             clone_date = parse_date(clone_date_string)
-#             print 'clone_date = ', clone_date
-#             if clone_date:
-#                 load_plan_from_database_to_session(request.session,
-#                                                    request.user,
-#                                                    clone_date[0],
-#                                                    clone_date[1],
-#                                                    clone_date[2])
-#                 print '3: plan_order = ', request.session['plan_order' + date_str]
-#                 print '3: meal_plan = ', request.session['meal_plan' + date_str]
-
-#                 print 'session = ', request.session
         if request.POST:
             plan_form_list = load_plan_from_database(request.user, year, month, day)
             data = request.POST.copy()
+            print 'data = ', data
             plan_form_list = create_plan_from_data(data, plan_form_list, year, month, day)
             save_result = save_plan_to_database(request.user, plan_form_list, year, month, day)
 
             if data.has_key('refresh'):
+                return HttpResponseRedirect('')
+
+            if data.has_key('copy_plan'):
+                form_data = {'copy_date' : data['copy_date']}
+                copy_date_form = PlanCopyDate(form_data)
+                print 'form = ', copy_date_form
+                if copy_date_form.is_valid():
+                    print 'data = ', copy_date_form.cleaned_data
+                else:
+                    print 'form is not valid'
                 return HttpResponseRedirect('')
 
             if data.has_key('add_recipe'):
@@ -346,10 +345,13 @@ def daily_plan(request, year=None, month=None, day=None, food_id=None, recipe_id
 
     filler_list = [i for i in range(10 - len(plan_form_list))]
 
+    copy_date_form = PlanCopyDate()
+
     return render_to_response( 'daily_plan.html', {
             "cal": month_calendar,
             "plan_list": plan_form_list,
             "filler_list": filler_list,
             "nutrients": nutrients,
+            "copy_date_form": copy_date_form,
             "save_result" : save_result
             })

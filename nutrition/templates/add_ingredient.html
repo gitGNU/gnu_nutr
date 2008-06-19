@@ -1,55 +1,57 @@
 {% extends "base.html" %}
 
 {% comment %}
-  web_nutrition: a web based nutrition and diet analysis program.
-  Copyright (C) 2008 Edgar Denny
+web_nutrition: a web based nutrition and diet analysis program.
+Copyright (C) 2008 Edgar Denny
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Affero General Public License as
-  published by the Free Software Foundation, either version 3 of the
-  License, or (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU Affero General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
 
-  You should have received a copy of the GNU Affero General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
 {% block title %}Add Ingredient{% endblock %}
 
 {% block menu_create_recipe %}class="active"{% endblock %}
 
-{% block page_css %}<link rel="stylesheet" type="text/css" href="/site_media/styles/add_ingredient.css" />{% endblock %}
+{% block page_css %}
+<link rel="stylesheet" type="text/css" href="/site_media/styles/add_ingredient.css" />
+{% endblock %}
 
 {% block content %}
-  <form id="add-ingredient-form" action="." method="GET">
-      <div class="label-input">
-        <label id="food-text" for="id_text" class="labelclass">Food to Search :</label>
-        {{ form.text|escape }}
-        {% if not first_show %}
-        {% if form.text.errors %}<span class="errors">*</span>{% endif %}
-        {% endif %}
-      </div>
-      <div class="label-input">
-        <label id="food-group" for="id_food_group" class="labelclass">Food Category :</label>
-        {{ form.food_group|escape }}
-      </div>
-      <input class="button" type="submit" value="Search">
-  </form>
-
-  {% if search_text %}
-    <h2>Search Results</h2>
-    {% if food_list %}
-      <ul id="links">
-        {% for food in food_list %}
-          <li><a class="{% cycle 'odd' 'even' %}" href="/create_recipe/recipe_id/{{ recipe_id }}/food_id/{{ food.food_id|stringformat:"d" }}">{{ food.food_name }}</a></li>
-        {% endfor %}
-        </ul>
-    {% else %}
-      <p>No Foods Found</p>
+<form id="add-ingredient-form" action="." method="GET">
+  <div class="label-input">
+    <label id="food-text" for="id_text" class="labelclass">Food to Search :</label>
+    {{ form.text|escape }}
+    {% if not first_show %}
+    {% if form.text.errors %}<span class="errors">*</span>{% endif %}
     {% endif %}
+  </div>
+  <div class="label-input">
+    <label id="food-group" for="id_food_group" class="labelclass">Food Category :</label>
+    {{ form.food_group|escape }}
+  </div>
+  <input class="button" type="submit" value="Search">
+</form>
+
+{% if search_text %}
+  <h2>Search Results</h2>
+  {% if food_list %}
+    <ul id="links">
+      {% for food in food_list %}
+      <li><a class="{% cycle 'odd' 'even' %}" href="/create_recipe/recipe_id/{{ recipe_id }}/food_id/{{ food.food_id|stringformat:"d" }}">{{ food.food_name }}</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No Foods Found</p>
   {% endif %}
+{% endif %}
 {% endblock %}
