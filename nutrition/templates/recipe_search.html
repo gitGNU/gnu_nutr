@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "menu.html" %}
 
 {% comment %}
   web_nutrition: a web based nutrition and diet analysis program.
@@ -35,7 +35,7 @@
     </div>
     <div class="label-input">
       <label id="food-text" for="id_category" class="labelclass">Recipe Category :</label>
-      {{ form.category|escape }}
+      {{ form.category }}
     </div>
     <input class="button" type="submit" value="Search">
     {% if not first_show %}
@@ -43,19 +43,12 @@
     {% endif %}
   </form>
 
-  {% if not recipes %}
-  <br />
-  <br />
-  <br />
-  <br />
-  {% endif %}
-
   {% if text %}
     <h2>Recipes Found :</h2>
     {% if recipes %}
       <ul id="links">
-        {% for recipe in recipes %}
-          <li><a class="{% cycle 'odd' 'even' %}" href="recipe_id/{{ recipe.recipe_id|stringformat:"d" }}">{{ recipe.recipe_name }}</a></li>
+        {% for r in recipes %}
+          <li><a class="{% cycle 'odd' 'even' %}" href="recipe_id/{{ r.recipe_id|stringformat:"d" }}">{{ r.recipe_name }}</a></li>
         {% endfor %}
       </ul>
     {% else %}

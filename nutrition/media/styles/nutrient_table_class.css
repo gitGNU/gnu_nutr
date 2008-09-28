@@ -14,86 +14,44 @@
 /* You should have received a copy of the GNU Affero General Public License */
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-#ingredientform
-{
-  border: 1px solid #000;
-  margin-bottom: 2em;
+.graph {
+  position: relative;
+  width: 60%;
 }
 
-#ingredientform #buttons
-{
-  padding: 0.5em;
-}
-
-#recipeid
-{
-  padding: 1em;
-}
-
-#recipename input
-{
-  width: 50em;
-}
-
-/* create recipe form */
-
-#recipe-form
-{
-  padding: 1em;
-}
-
-#create-recipe-form
-{
-  padding-bottom: 2em;
-}
-
-#create-recipe-form label, #food-search-form label
-{
+.graph span#bar {
   display: block;
+  position: relative;
+  background: #a2cd5a;
+  border: 1px solid #000;
+  color: #333;
+  text-align: left;
+  text-indent: -9999px;
+  overflow: hidden;
+  line-height: 1em;
 }
 
-#create-recipe-form input
-{
-  width: 10em;
-}
-
-#create-recipe-form #recipe-name input
-{
-  width: 99%;
-}
-
-#create-recipe-form #num-servings
-{
-  float: left;
-  padding-right: 3em;
-}
-
-#create-recipe-form #num-servings label
-{
-  padding-top: 0.5em;
-}
-
-table.ingredient-table {
+table.nutrient-table-class {
   border-color: #000;
+  border-width: 1px;
   border-style: solid;
   border-collapse: collapse;
   width: 100%;
-  border-width: 1px;
 }
 
-table.ingredient-table th {
+table.nutrient-table-class th {
   border-color: #000;
   border-width: 1px;
   border-style: solid;
   padding-left: 1em;
   padding-right: 1em;
   text-align: left;
-  border-bottom-width: 2px;
 }
 
-table.ingredient-table td {
+table.nutrient-table-class td {
   border-color: #000;
   border-width: 1px;
+  border-width: 1px 1px 0px 0px;
   border-style: solid;
   padding-left: 1em;
   padding-right: 1em;
@@ -101,23 +59,32 @@ table.ingredient-table td {
   text-align: left;
 }
 
-table.ingredient-table td.first {
+table.nutrient-table-class td.left {
+  text-align: left;
+  padding-left: 0.5em;
+  border-left-width: 0px;
+}
+
+table.nutrient-table-class td.right {
+  text-align: right;
+  border-width: 1px 0px 0px 0px;
+  padding-right: 0em;
+}
+
+table.nutrient-table-class td.first {
   padding: 0px;
 }
 
-table.ingredient-table td.second, table.ingredient-table td.second input {
+table.nutrient-table-class td.second, table.nutrient-table-class td.second input, table.nutrient-table-class td.third {
   width: 5em;
   padding: 2px;
 }
 
-table.ingredient-table td.third, table.ingredient-table td.third select {
+table.nutrient-table-class td.third select {
   width: 17em;
-  padding: 2px;
 }
 
-table.ingredient-table .fourth {
+table.nutrient-table-class .fourth {
   width: 100%;
   padding-left: 1em;
 }
-
-

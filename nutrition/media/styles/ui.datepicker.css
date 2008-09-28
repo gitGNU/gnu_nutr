@@ -92,7 +92,7 @@ img.datepicker_trigger {
 }
 .datepicker_control, .datepicker_links {
   font-weight: bold;
-  font-size: 80%;
+  font-size: 1em;
   letter-spacing: 1px;
 }
 .datepicker_links label { /* disabled links */
@@ -127,17 +127,20 @@ img.datepicker_trigger {
   text-align: center;
   font-weight: bold;
   height: 1.3em;
+  width: 14em;
+/*   width: 100%; */
 }
 .datepicker_header select {
-  background: #333;
-  color: #fff;
+  background: #fff;
+  color: #000;
   border: 0px;
   font-weight: bold;
+/*   width: 7em; */
 }
 .datepicker {
   background: #ccc;
   text-align: center;
-  font-size: 100%;
+  font-size: 1em;
 }
 .datepicker a {
   display: block;
@@ -192,7 +195,7 @@ img.datepicker_trigger {
 .datepicker_status {
   background: #ddd;
   width: 100%;
-  font-size: 80%;
+  font-size: 1em;
   text-align: center;
 }
 
@@ -241,7 +244,7 @@ img.datepicker_trigger {
 
 .datepicker_oneMonth {
   float: left;
-  /* 	width: 185px; */
+/*   width: 185px; */
 }
 
 .datepicker_newRow {

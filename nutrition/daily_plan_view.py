@@ -14,19 +14,18 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
-from django import newforms as forms
+from django import forms
 
-from calendar import monthcalendar, day_abbr, month_abbr
 from datetime import *
 import time
 
 from models import *
 
 class PlanFoodForm(forms.Form):
-    check = forms.BooleanField()
+    check = forms.BooleanField(required=False)
     num_measures = forms.DecimalField()
     measure = forms.ChoiceField()
 
@@ -38,23 +37,12 @@ class PlanFoodForm(forms.Form):
             [(m.measure_id, m.measure_name) for m in measure_list]
 
 class PlanRecipeForm(forms.Form):
-    check = forms.BooleanField()
+    check = forms.BooleanField(required=False)
     num_measures = forms.DecimalField(required=True)
     measure = forms.CharField(widget=forms.TextInput(attrs={'readonly':''}))
 
 class PlanCopyDate(forms.Form):
     copy_date = forms.DateField(input_formats=['%Y/%m/%d'], widget=forms.TextInput(attrs={'style':'width:10em'}))
-
-def abbreviated_days():
-    day_list = [];
-    for day in day_abbr:
-        day_list.append(day[0])
-    return day_list
-
-abbreviated_day_list = abbreviated_days
-
-def abbreviated_month(i):
-    return month_abbr[i]
 
 def get_today():
     dt = date.today()
@@ -69,22 +57,8 @@ class MonthCalendar:
         if day:
             day = int(day)
         self.year = year
-        self.prev_year = year - 1
-        self.next_year = year + 1
         self.month = month
-        self.next_month = month + 1
-        if month + 1 > 12:
-            self.next_month = 1
-        else:
-            self.next_month = month + 1
-        if month - 1 < 1:
-            self.prev_month = 12
-        else:
-            self.prev_month = month - 1
         self.day = day
-        self.month_name = abbreviated_month(month)
-        self.day_names = abbreviated_day_list
-        self.calendar_rows = monthcalendar(year, month)
 
 def food_in_plan(food_id, plan_form_list):
     for form in plan_form_list:
@@ -99,31 +73,32 @@ def recipe_in_plan(recipe_id, plan_form_list):
     return False
 
 def create_plan_form(food_id=None, recipe_id=None):
+    form = None
     if food_id:
         measure_list = get_measures(food_id)
         name = food_id_2_name(food_id)
-        prefix = '%s_%s' % (form.item_id, form.item_type)
-        form_data = {'%s-check' % prefix: False,
-                     '%s-num_measures' % prefix: 1,
-                     '%s-measure' % prefix: measure_list[0].measure_id}
-        form = PlanFoodForm(form_data, measure=measure_list, prefix=prefix)
-        form.item_type = 'food'
-        form.item_id = food_id
-        form.name_str = name
-        form.measure_str = measure_list[0].measure_id
+        if name and measure_list:
+            prefix = '%s_food' % food_id
+            form_data = {'%s-check' % prefix: False,
+                         '%s-num_measures' % prefix: 1,
+                         '%s-measure' % prefix: measure_list[0].measure_id}
+            form = PlanFoodForm(form_data, measure=measure_list, prefix=prefix)
+            form.item_type = 'food'
+            form.item_id = food_id
+            form.name_str = name
+            form.measure_str = measure_list[0].measure_id
     elif recipe_id:
         name = get_recipe_name(recipe_id)
-        prefix = '%s_%s' % (form.item_id, form.item_type)
-        form_data = {'%s-check' % prefix: False,
-                     '%s-num_measures' % prefix: 1,
-                     '%s-measure' % prefix: '1 serving'}
-        form = PlanRecipeForm(form_data, prefix=prefix)
-        form.item_type = 'recipe'
-        form.item_id = recipe_id
-        form.name_str = name
-        form.measure_str = '1 serving'
-    else:
-        return None
+        if name:
+            prefix = '%s_recipe' % recipe_id
+            form_data = {'%s-check' % prefix: False,
+                         '%s-num_measures' % prefix: 1,
+                         '%s-measure' % prefix: '1 serving'}
+            form = PlanRecipeForm(form_data, prefix=prefix)
+            form.item_type = 'recipe'
+            form.item_id = recipe_id
+            form.name_str = name
+            form.measure_str = '1 serving'
     return form
 
 def save_plan_to_database(user, plan_form_list, year, month, day):
@@ -165,32 +140,32 @@ def load_plan_from_database(user, year, month, day):
             food_id = o.item_id
             prefix = '%s_food' % food_id
             measure_list = get_measures(food_id)
-            selected_measure = get_measure_from_measure_list(measure_list, o.measure)
             name = food_id_2_name(food_id)
-            form_data = {'%s-check' % prefix: False,
-                         '%s-num_measures' % prefix: o.num_measures,
-                         '%s-measure' % prefix: o.measure}
-            form = PlanFoodForm(form_data, measure=measure_list, prefix=prefix)
-            form.item_type = 'food'
-            form.item_id = food_id
-            form.name_str = name
-            form.measure_str = selected_measure.measure_id
-            plan_form_list.append(form)
+            if name and measure_list:
+                selected_measure = get_measure_from_measure_list(measure_list, o.measure)
+                form_data = {'%s-check' % prefix: False,
+                             '%s-num_measures' % prefix: o.num_measures,
+                             '%s-measure' % prefix: o.measure}
+                form = PlanFoodForm(form_data, measure=measure_list, prefix=prefix)
+                form.item_type = 'food'
+                form.item_id = food_id
+                form.name_str = name
+                form.measure_str = selected_measure.measure_id
+                plan_form_list.append(form)
         elif o.item_type == 'R':
             recipe_id = o.item_id
             name = get_recipe_name(recipe_id)
-            prefix = '%s_recipe' % recipe_id
-            form_data = {'%s-check' % prefix: False,
-                         '%s-num_measures' % prefix: o.num_measures,
-                         '%s-measure' % prefix: '1 serving'}
-            form = PlanRecipeForm(form_data, prefix=prefix)
-            form.item_type = 'recipe'
-            form.item_id = recipe_id
-            form.name_str = name
-            form.measure_str = '1 serving'
-            plan_form_list.append(form)
-        else:
-            pass
+            if name:
+                prefix = '%s_recipe' % recipe_id
+                form_data = {'%s-check' % prefix: False,
+                             '%s-num_measures' % prefix: o.num_measures,
+                             '%s-measure' % prefix: '1 serving'}
+                form = PlanRecipeForm(form_data, prefix=prefix)
+                form.item_type = 'recipe'
+                form.item_id = recipe_id
+                form.name_str = name
+                form.measure_str = '1 serving'
+                plan_form_list.append(form)
     return plan_form_list
 
 def create_plan_from_data(data, old_plan_form_list, year, month, day):
@@ -200,53 +175,53 @@ def create_plan_from_data(data, old_plan_form_list, year, month, day):
             food_id = form.item_id
             prefix = '%s_%s' % (form.item_id, form.item_type)
             measure_list = get_measures(food_id)
-            measure_id = data['%s-measure' % prefix]
-            selected_measure = get_measure_from_measure_list(measure_list, measure_id)
             name = food_id_2_name(food_id)
-            if '%s-check' % prefix in data:
-                check = data['%s-check' % prefix]
-            else:
-                check = False
-            try:
-                num_measures = float(data['%s-num_measures' % prefix])
-            except ValueError:
-                num_measures = 1.0
-            if num_measures > 10000.0:
-                num_measures = 10000.0
-            form_data = {'%s-check' % prefix: check,
-                         '%s-num_measures' % prefix: num_measures,
-                         '%s-measure' % prefix: measure_id}
-            new_form = PlanFoodForm(form_data, measure=measure_list, prefix=prefix)
-            new_form.item_type = 'food'
-            new_form.item_id = food_id
-            new_form.name_str = name
-            new_form.measure_str = selected_measure.measure_id
-            new_plan_form_list.append(new_form)
+            if name and measure_list:
+                measure_id = data['%s-measure' % prefix]
+                selected_measure = get_measure_from_measure_list(measure_list, measure_id)
+                if '%s-check' % prefix in data:
+                    check = data['%s-check' % prefix]
+                else:
+                    check = False
+                try:
+                    num_measures = float(data['%s-num_measures' % prefix])
+                except ValueError:
+                    num_measures = 1.0
+                if num_measures > 10000.0:
+                    num_measures = 10000.0
+                form_data = {'%s-check' % prefix: check,
+                             '%s-num_measures' % prefix: num_measures,
+                             '%s-measure' % prefix: measure_id}
+                new_form = PlanFoodForm(form_data, measure=measure_list, prefix=prefix)
+                new_form.item_type = 'food'
+                new_form.item_id = food_id
+                new_form.name_str = name
+                new_form.measure_str = selected_measure.measure_id
+                new_plan_form_list.append(new_form)
         elif form.item_type == 'recipe':
             recipe_id = form.item_id
             prefix = '%s_%s' % (form.item_id, form.item_type)
             name = get_recipe_name(recipe_id)
-            if '%s-check' % prefix in data:
-                check = data['%s-check' % prefix]
-            else:
-                check = False
-            try:
-                num_measures = float(data['%s-num_measures' % prefix])
-            except ValueError:
-                num_measures = 1.0
-            if num_measures > 10000.0:
-                num_measures = 10000.0
-            form_data = {'%s-check' % prefix: check,
-                         '%s-num_measures' % prefix: num_measures,
-                         '%s-measure' % prefix: '1 serving'}
-            new_form = PlanRecipeForm(form_data, prefix=prefix)
-            new_form.item_type = 'recipe'
-            new_form.item_id = recipe_id
-            new_form.name_str = name
-            new_form.measure_str = '1 serving'
-            new_plan_form_list.append(new_form)
-        else:
-            pass
+            if name:
+                if '%s-check' % prefix in data:
+                    check = data['%s-check' % prefix]
+                else:
+                    check = False
+                try:
+                    num_measures = float(data['%s-num_measures' % prefix])
+                except ValueError:
+                    num_measures = 1.0
+                if num_measures > 10000.0:
+                    num_measures = 10000.0
+                form_data = {'%s-check' % prefix: check,
+                             '%s-num_measures' % prefix: num_measures,
+                             '%s-measure' % prefix: '1 serving'}
+                new_form = PlanRecipeForm(form_data, prefix=prefix)
+                new_form.item_type = 'recipe'
+                new_form.item_id = recipe_id
+                new_form.name_str = name
+                new_form.measure_str = '1 serving'
+                new_plan_form_list.append(new_form)
     return new_plan_form_list
 
 def append_calorie_data_to_plan(old_plan_form_list, calories_dict):
@@ -268,8 +243,23 @@ def parse_date(date_string):
     except ValueError:
         return None
 
+def copy_plan_from_date(user, source_date):
+    year = source_date.strftime('%Y')
+    month = source_date.strftime('%m')
+    day = source_date.strftime('%d')
+    plan_form_list = load_plan_from_database(user, year, month, day)
+    return plan_form_list
+
 @login_required
 def daily_plan(request, year=None, month=None, day=None, food_id=None, recipe_id=None):
+
+    plan_date = None
+    if year or month or day:
+        try:
+            plan_date = date(int(year), int(month), int(day))
+        except ValueError:
+            raise Http404
+
     save_result = 2
 
     if year == None or month == None or day == None:
@@ -282,7 +272,15 @@ def daily_plan(request, year=None, month=None, day=None, food_id=None, recipe_id
 
     month_calendar = MonthCalendar(year, month, day)
 
+    if plan_date:
+        delta =  plan_date - date.today()
+        days_from_today = delta.days
+    else:
+        days_from_today = 0
+
     if food_id:
+        # FIXME: need to check web-page - not just database - problem
+        # with reload page.
         plan_form_list = load_plan_from_database(request.user, year, month, day)
         if not food_in_plan(food_id, plan_form_list):
             new_form = create_plan_form(food_id=food_id)
@@ -298,23 +296,22 @@ def daily_plan(request, year=None, month=None, day=None, food_id=None, recipe_id
                 save_plan_to_database(request.user, plan_form_list, year, month, day)
     else:
         if request.POST:
+
             plan_form_list = load_plan_from_database(request.user, year, month, day)
             data = request.POST.copy()
-            print 'data = ', data
             plan_form_list = create_plan_from_data(data, plan_form_list, year, month, day)
             save_result = save_plan_to_database(request.user, plan_form_list, year, month, day)
 
             if data.has_key('refresh'):
                 return HttpResponseRedirect('')
 
-            if data.has_key('copy_plan'):
+            if data.has_key('copy_plan') and data.has_key('copy_date'):
                 form_data = {'copy_date' : data['copy_date']}
                 copy_date_form = PlanCopyDate(form_data)
-                print 'form = ', copy_date_form
                 if copy_date_form.is_valid():
-                    print 'data = ', copy_date_form.cleaned_data
-                else:
-                    print 'form is not valid'
+                    plan_form_list = copy_plan_from_date(request.user,
+                                                         copy_date_form.cleaned_data['copy_date'])
+                    save_result = save_plan_to_database(request.user, plan_form_list, year, month, day)
                 return HttpResponseRedirect('')
 
             if data.has_key('add_recipe'):
@@ -353,5 +350,6 @@ def daily_plan(request, year=None, month=None, day=None, food_id=None, recipe_id
             "filler_list": filler_list,
             "nutrients": nutrients,
             "copy_date_form": copy_date_form,
-            "save_result" : save_result
+            "save_result" : save_result,
+            "days_from_today" : days_from_today
             })

@@ -45,35 +45,73 @@ div#container
   min-width: 47em;
 }
 
-ul
+a
 {
-  margin-left: 0;
-  padding-left: 0;
-}
-
-#links li
-{
-  list-style: none;
-}
-
-#links a
-{
-  display: block;
+  display: inline;
   color: #0000FF;
   text-decoration: none;
 }
 
-#links a.odd
+tr.odd
 {
   background: #E8E8E8;
 }
 
-#links a:visited
+a:visited
 {
   color: #0000FF;
 }
 
-#links a:hover
+a:hover
 {
   text-decoration: underline;
 }
+
+table.table-class {
+  border-color: #000;
+  border-width: 1px;
+  border-style: solid;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table.table-class th {
+  border-color: #000;
+  border-width: 1px;
+  border-bottom-width: 2px;
+  border-style: solid;
+  padding-left: 1em;
+  padding-right: 1em;
+  text-align: left;
+}
+
+table.table-class td {
+  border-color: #000;
+  border-width: 1px;
+  border-style: solid;
+  padding-left: 1em;
+  padding-right: 1em;
+  height: 1.5em;
+  text-align: left;
+}
+
+
+table.table-class td.first {
+  padding: 0px;
+  width: 1em;
+}
+
+/* table.table-class td.second, table.table-class td.second input, table.table-class td.third { */
+/*   width: 5em; */
+/*   padding: 2px; */
+/* } */
+
+/* table.table-class td.third select { */
+/*   width: 17em; */
+/* } */
+
+/* table.table-class .fourth { */
+/*   width: 100%; */
+/*   padding-left: 1em; */
+/* } */
+

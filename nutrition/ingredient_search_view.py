@@ -14,10 +14,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
-from django import newforms as forms
+from django import forms
 
 from models import *
 
@@ -32,6 +32,9 @@ class IngredientSearchForm(forms.Form):
 
 @login_required
 def add_ingredient(request, recipe_id=None):
+    if recipe_id and not get_recipe(recipe_id):
+        raise Http404
+
     data = request.GET.copy()
     if data.has_key('text'):
         first_show = False

@@ -17,11 +17,8 @@
 #ui-datepicker
 {
   background: #aabbcc;
-  margin: 2px 0 2px 2px;
-  padding: 1em;
-/*   display: block; */
+  margin: 1em;
   float: left;
-  width: 13.8em;
 }
 
 div#plan-form-container
@@ -34,11 +31,49 @@ div#plan-form-buttons
   margin: 2px;
 }
 
-#input-right
-{
-  float: right;
+table.plan-table-class {
+  border-color: #000;
+  border-style: solid;
+  border-collapse: collapse;
+  width: 100%;
 }
 
+table.plan-table-class th {
+  border-color: #000;
+  border-width: 1px;
+  border-style: solid;
+  padding-left: 1em;
+  padding-right: 1em;
+  text-align: left;
+}
 
+table.plan-table-class td {
+  border-color: #000;
+  border-width: 1px;
+  border-style: solid;
+  padding-left: 1em;
+  padding-right: 1em;
+  height: 1.5em;
+  text-align: left;
+}
+
+table.plan-table-class td.first {
+  padding: 0px;
+}
+
+table.plan-table-class td.second, table.plan-table-class td.second input {
+  width: 5em;
+  padding: 2px;
+}
+
+table.plan-table-class td.third, table.plan-table-class td.third select {
+  width: 17em;
+  padding: 2px;
+}
+
+table.plan-table-class .fourth {
+  width: 100%;
+  padding-left: 1em;
+}
 
 

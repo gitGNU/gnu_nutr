@@ -1,37 +1,67 @@
-{% extends "base.html" %}
-
 {% comment %}
-  web_nutrition: a web based nutrition and diet analysis program.
-  Copyright (C) 2008 Edgar Denny
+web_nutrition: a web based nutrition and diet analysis program.
+Copyright (C) 2008 Edgar Denny
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Affero General Public License as
-  published by the Free Software Foundation, either version 3 of the
-  License, or (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU Affero General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
 
-  You should have received a copy of the GNU Affero General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en">
+  <head>
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="/site_media/styles/menu.css" />
+    {% block page_css %}{% endblock %}
+    {% block page_javascript %}{% endblock %}
+  </head>
 
-{% block title %}Web Nutrition{% endblock %}
+  <body>
+    <div id="container">
+      <div id="header">
+        <h1>Web Nutrition</h1>
+      </div>
 
-{% block content %}
-  <h1>Welcome to Web Nutrition</h1>
-      <ul>
-        <li><a id="login" href="/accounts/login/?next=/menu/">Login</a></li>
-        <li><a id="register" href="/register/">New User</a></li>
-        <li><a id="set_rdi" href="/set_rdi/">Set Personal RDIs</a></li>
-        <li><a id="food_search" href="/food_search/">Food Search</a></li>
-        <li><a id="nutrient_search" href="/nutrient_search/">Nutrient Search</a></li>
-        <li><a id="create_recipe" href="/create_recipe/0/">Create Recipe</a></li>
-        <li><a id="search_recipe" href="/search_recipe/">Recipe Search</a></li>
-        <li><a id="edit_recipe" href="/search_edit_recipe/">Edit Recipe</a></li>
-        <li><a id="daily plan" href="/daily_plan/">Daily Plan</a></li>
-      </ul>
-{% endblock %}
+      <div class="colmask leftmenu">
+        <div class="colright">
+          <div class="col1wrap">
+            <div class="right-hs">
+              <div id="content">
+                {% block content %}
+                {% endblock %}
+              </div>
+            </div>
+          </div>
+
+          <div class="left-hs">
+            <div id="menu">
+              <h4>Navigation</h4>
+              <a id="login" {% block menu_login %}{% endblock %} href="/accounts/login/?next=/main/">Login</a>
+              <a id="register" {% block menu_register %}{% endblock %} href="/register/">New User</a>
+              <a id="set_rdi" {% block menu_set_rdi %}{% endblock %} href="/set_rdi/">Set Personal RDIs</a>
+              <a id="food_search" {% block menu_food_search %}{% endblock %} href="/food_search/">Food Search</a>
+              <a id="nutrient_search" {% block menu_nutrient_search %}{% endblock %} href="/nutrient_search/">Nutrient Search</a>
+              <a id="create_recipe" {% block menu_create_recipe %}{% endblock %} href="/create_recipe/">Create Recipe</a>
+              <a id="search_recipe" {% block menu_search_recipe %}{% endblock %} href="/search_recipe/">Recipe Search</a>
+              <a id="daily plan" {% block menu_daily_plan %}{% endblock %} href="/daily_plan/">Daily Plan</a>
+            </div>
+            {% block calendar %}
+            {% endblock %}
+          </div>
+        </div>
+      </div>
+      <div id="footer">
+        <h5>Edgar Denny</h5>
+      </div>
+    </div>
+  </body>
+</html>

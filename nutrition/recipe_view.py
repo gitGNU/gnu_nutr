@@ -17,7 +17,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
-from django import newforms as forms
+from django import forms
 
 from models import *
 
@@ -32,7 +32,7 @@ class RecipeForm(forms.Form):
             [(c.category_id, c.category_name) for c in get_recipe_categories()]
 
 class IngredientForm(forms.Form):
-    check = forms.BooleanField()
+    check = forms.BooleanField(required=False)
     num_measures = forms.DecimalField()
     measure = forms.ChoiceField()
 
@@ -45,26 +45,35 @@ class IngredientForm(forms.Form):
 
 def load_recipe_from_database(recipe_id):
     ingredient_form_list = []
+    recipe_form = None
     if recipe_id:
         r = get_recipe(recipe_id)
-        form_data = {'name': r.recipe_name,
-                     'num_servings': r.number_servings,
-                     'category':  r.category_id}
-        recipe_form = RecipeForm(form_data)
-        ingredient_list = get_ingredients(recipe_id)
-        for i in ingredient_list:
-            f = get_food(i.food_id)
-            measure_list = get_measures(i.food_id)
-            measure = get_measure_from_measure_list(measure_list, i.measure_id)
-            form_data = {'%s-check' % i.food_id: False,
-                         '%s-num_measures' % i.food_id: i.number_measures,
-                         '%s-measure' % i.food_id: i.measure_id}
-            ingredient_form = IngredientForm(form_data, measure=measure_list, prefix=i.food_id)
-            ingredient_form.food_id = i.food_id
-            ingredient_form.food_name = f.food_name
-            ingredient_form.measure_str = measure.measure_name
-            ingredient_form.amount = i.number_measures
-            ingredient_form_list.append(ingredient_form)
+        if r:
+            form_data = {'name': r.recipe_name,
+                         'num_servings': r.number_servings,
+                         'category':  r.category_id}
+            recipe_form = RecipeForm(form_data)
+            ingredient_list = get_ingredients(recipe_id)
+            for i in ingredient_list:
+                f = get_food(i.food_id)
+                if f:
+                    measure_list = get_measures(i.food_id)
+                    measure = get_measure_from_measure_list(measure_list, i.measure_id)
+                    form_data = {'%s-check' % i.food_id: False,
+                                 '%s-num_measures' % i.food_id: i.number_measures,
+                                 '%s-measure' % i.food_id: i.measure_id}
+                    ingredient_form = IngredientForm(form_data, measure=measure_list, prefix=i.food_id)
+                    ingredient_form.food_id = i.food_id
+                    ingredient_form.food_name = f.food_name
+                    ingredient_form.measure_id = i.measure_id
+                    ingredient_form.amount = i.number_measures
+                    ingredient_form_list.append(ingredient_form)
+        else:
+            recipe_category_list = get_recipe_categories()
+            form_data = {'name': "Insert your Recipe's Name here",
+                         'num_servings': 1.0,
+                         'category':  recipe_category_list[0].category_id}
+            recipe_form = RecipeForm(form_data)
     else:
         recipe_category_list = get_recipe_categories()
         form_data = {'name': "Insert your Recipe's Name here",
@@ -89,29 +98,30 @@ def create_forms_from_data(data, recipe_form, ingredient_form_list):
     new_recipe_form = RecipeForm(form_data)
     for i in ingredient_form_list:
         f = get_food(i.food_id)
-        measure_list = get_measures(i.food_id)
-        measure_id = data['%s-measure' % i.food_id]
-        measure = get_measure_from_measure_list(measure_list, measure_id)
-        if '%s-check' % i.food_id in data:
-            check = data['%s-check' % i.food_id]
-        else:
-            check = False
-        num_measures = data['%s-num_measures' % i.food_id]
-        try:
-            num_measures = float(num_measures)
-        except ValueError:
-            num_measures = '1.0'
-            if num_measures > 10000.0:
-                num_measures = 10000.0
-        form_data = {'%s-check' % i.food_id: check,
-                     '%s-num_measures' % i.food_id: num_measures,
-                     '%s-measure' % i.food_id: measure_id}
-        new_ingredient_form = IngredientForm(form_data, measure=measure_list, prefix=i.food_id)
-        new_ingredient_form.food_id = i.food_id
-        new_ingredient_form.food_name = f.food_name
-        new_ingredient_form.measure_str = measure.measure_name
-        new_ingredient_form.amount = num_measures
-        new_ingredient_form_list.append(new_ingredient_form)
+        if f:
+            measure_list = get_measures(i.food_id)
+            measure_id = data['%s-measure' % i.food_id]
+            measure = get_measure_from_measure_list(measure_list, measure_id)
+            if '%s-check' % i.food_id in data:
+                check = data['%s-check' % i.food_id]
+            else:
+                check = False
+            num_measures = data['%s-num_measures' % i.food_id]
+            try:
+                num_measures = float(num_measures)
+            except ValueError:
+                num_measures = '1.0'
+                if num_measures > 10000.0:
+                    num_measures = 10000.0
+            form_data = {'%s-check' % i.food_id: check,
+                         '%s-num_measures' % i.food_id: num_measures,
+                         '%s-measure' % i.food_id: measure_id}
+            new_ingredient_form = IngredientForm(form_data, measure=measure_list, prefix=i.food_id)
+            new_ingredient_form.food_id = i.food_id
+            new_ingredient_form.food_name = f.food_name
+            new_ingredient_form.measure_id = measure_id
+            new_ingredient_form.amount = num_measures
+            new_ingredient_form_list.append(new_ingredient_form)
     return new_recipe_form, new_ingredient_form_list
 
 def food_in_recipe(food_id, ingredient_form_list):
@@ -123,15 +133,16 @@ def food_in_recipe(food_id, ingredient_form_list):
 def create_new_ingredient(food_id):
     name = food_id_2_name(food_id)
     f = get_food(food_id)
-    measure_list = get_measures(food_id)
-    ingredient_data = {'%s-check' % food_id: False,
-                       '%s-num_measures' % food_id: 1.0,
-                       '%s-measure' % food_id: measure_list[0].measure_id}
-    ingredient_form = IngredientForm(ingredient_data, measure=measure_list, prefix=food_id)
-    ingredient_form.food_id = int(food_id)
-    ingredient_form.food_name = f.food_name
-    ingredient_form.measure_str = measure_list[0].measure_name
-    ingredient_form.amount = 1.0
+    if f and name:
+        measure_list = get_measures(food_id)
+        ingredient_data = {'%s-check' % food_id: False,
+                           '%s-num_measures' % food_id: 1.0,
+                           '%s-measure' % food_id: measure_list[0].measure_id}
+        ingredient_form = IngredientForm(ingredient_data, measure=measure_list, prefix=food_id)
+        ingredient_form.food_id = int(food_id)
+        ingredient_form.food_name = f.food_name
+        ingredient_form.measure_id = measure_list[0].measure_id
+        ingredient_form.amount = 1.0
     return ingredient_form
 
 def delete_from_recipe(old_ingredient_form_list, data):

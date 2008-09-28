@@ -27,30 +27,25 @@ body {
   padding: 0;
 }
 
-form
-{
+form {
   margin-bottom: 1em;
   padding: 0.5em;
-/*   border: 1px solid #000; */
+  /*   border: 1px solid #000; */
 }
 
-form label
-{
+form label {
   padding-right: 0.5em;
 }
 
-div #food-amount
-{
+div #food-amount {
   display: inline;
 }
 
-.errors
-{
+.errors {
   color: #FF0000;
 }
 
-div #food-measure
-{
+div #food-measure {
   padding-left: 2em;
   display: inline;
 }
@@ -71,8 +66,7 @@ h1, h2, h3, h4, h5, h6
   line-height: 1.2em;
 }
 
-h1
-{
+h1 {
   font-size: 1.6em;
 }
 
@@ -80,219 +74,3 @@ h2 {font-size: 1.4em;}
 h3 {font-size: 1.3em;}
 h4 {font-size: 1.2em;}
 h5, h6 {font-size: 1em;}
-
-div#container
-{
-  margin-top: 1em;
-  margin-left: 1em;
-  margin-right: 1em;
-  margin-bottom: 1em;
-  background-color: #ddd;
-  border: 1px solid gray;
-}
-
-div#header
-{
-  padding: .5em;
-  background-color: #ddd;
-  border-bottom: 1px solid gray;
-}
-
-div#header h1
-{
-  padding: 0;
-  margin: 0;
-}
-
-.colmask {
-  position: relative;  /* This fixes the IE7 overflow hidden bug and stops the layout jumping out of place */
-  clear: both;
-  float: left;
-  width: 100%;       /* width of whole page */
-  overflow: hidden;  /* This chops off any overhanging divs */
-}
-
-.leftmenu {
-  background: #cfc;
-}
-
-.leftmenu .colright {
-  float: left;
-  width: 200%;
-  position: relative;
-  left: 16em;
-  background: #fff;
-}
-.leftmenu .col1wrap {
-  float: right;
-  width: 50%;
-  position:relative;
-  right: 16em;
-  padding-bottom: 1em;
-}
-
-.leftmenu .right-hs {
-  margin:0 1em 0 17em;
-  position:relative;
-  right:100%;
-  overflow:hidden;
-}
-
-.leftmenu .left-hs {
-  float: left;
-  width: 16em;
-  position: relative;
-  right: 16em;
-}
-
-.left-hs div#menu h4
-{
-  padding: 0;
-  margin: 2px 0 2px 2px;
-  text-align: left;
-  text-indent: 2em;
-  background: #ddd;
-  font-weight: bold;
-}
-
-.left-hs div#menu a
-{
-  text-decoration: none;
-  font-weight: bold;
-  color: #0000FF;
-  display: block;
-  background: #EBECE4;
-  margin: 2px 0 2px 2px;
-  padding: 0;
-  text-align: left;
-  text-indent: 2em;
-}
-
-.left-hs div#menu a.active
-{
-  background: #A9A9A9;
-}
-
-.left-hs div#menu a:hover
-{
-  text-decoration: underline;
-  background: #ddd;
-}
-
-.left-hs div#menu a:visited
-{
-  color: #0000FF;
-}
-
-div#footer
-{
-  clear: both;
-  background-color: #ddd;
-  border-top: 1px solid gray;
-}
-
-div#footer h5
-{
-  padding: 1em;
-  margin: 0;
-}
-
-.graph {
-        position: relative;
-        width: 60%;
-}
-
-.graph span#bar
-{
-  display: block;
-  position: relative;
-  background: #a2cd5a;
-  border: 1px solid #000;
-  color: #333;
-  text-align: left;
-  text-indent: -9999px;
-  overflow: hidden;
-  line-height: 1em;
-}
-
-div#content table
-{
-  border-color: #000;
-  border-width: 0px 0px 1px 1px;
-  border-style: solid;
-  border-collapse: collapse;
-  width: 100%;
-}
-
-div#content th
-{
-  border-color: #000;
-  border-width: 1px 1px 2px 0px;
-  border-style: solid;
-  padding-left: 1em;
-  padding-right: 1em;
-  text-align: left;
-}
-
-div#content td
-{
-  border-color: #000;
-  border-width: 1px 1px 0px 0px;
-  border-style: solid;
-  padding-left: 1em;
-  padding-right: 1em;
-  height: 1.5em;
-  text-align: left;
-}
-
-div#content td.left {
-  text-align: left;
-  padding-left: 0.5em;
-  border-left-width: 0px;
-}
-
-div#content td.right {
-  text-align: right;
-  border-width: 1px 0px 0px 0px;
-  padding-right: 0em;
-}
-
-div#content td.first
-{
-  padding: 0px;
-}
-
-div#content td.second, div#content td.second input, div#content td.third
-{
-  width: 5em;
-  padding: 2px;
-}
-
-div#content td.third select
-{
-  width: 17em;
-}
-
-div#content .fourth
-{
-  width: 100%;
-  padding-left: 1em;
-}
-
-/* ---------------------------------------------------------------
-Clearfix
---------------------------------------------------------------- */
-.clearfix:after {
-    content: ".";
-    display: block;
-    height: 0;
-    clear: both;
-    visibility: hidden;
-}
-
-.clearfix {display: inline-block;}
-
-/* Hides from IE-mac \*/
-* html .clearfix {height: 1%;}
-.clearfix {display: block;}
-/* End hide from IE-mac */

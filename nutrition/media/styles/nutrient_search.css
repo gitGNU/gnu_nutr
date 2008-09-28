@@ -14,49 +14,67 @@
 /* You should have received a copy of the GNU Affero General Public License */
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-#nutrient-search-form
-{
+div#nutr-search form {
 /*   padding-bottom: 5em; */
 }
 
-#nutrient-search-form label
-{
+div#nutr-search label {
   display: block;
 }
 
-#nutrient-search-form input
-{
+div#nutr-search input {
   width: 30em;
 }
 
-#nutrient-search-form .label-input
-{
+div#nutr-search .label-input {
   padding-bottom: 2em;
 }
 
-#nutrient-search-form input.button
-{
+div#nutr-search input.button {
   width: auto;
 }
 
-div#container
-{
-  /* left-hs + #nutrient-search-form input + 1 */
+div#container {
   min-width: 47em;
 }
 
-table#nutrient-search-table
-{
+div#nutr-search table {
   width: auto;
 }
 
-table#nutrient-search-table td, table#nutrient-search-table tr
-{
+div#nutr-search td, div#nutr-search tr {
   padding-left: 2px;
   padding-right: 2px;
 }
 
-table#nutrient-search-table select
-{
+div#nutr-search select {
+  width: auto;
+}
+
+table.nutrient-search-table {
+  border-color: #000;
+  border-style: solid;
+  border-collapse: collapse;
   width: 100%;
+  border-width: 1px;
+}
+
+table.nutrient-search-table th {
+  border-color: #000;
+  border-width: 1px;
+  border-style: solid;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  text-align: left;
+  border-bottom-width: 2px;
+}
+
+table.nutrient-search-table td {
+  border-color: #000;
+  border-width: 1px;
+  border-style: solid;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  height: 1.5em;
+  text-align: left;
 }

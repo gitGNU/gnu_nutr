@@ -107,7 +107,13 @@ def load_measure(file):
     f_in.close()
     f_out.close()
     psql_copy(file + '_out', 'nutrition_measure')
-    run_psql_command('INSERT into nutrition_measure SELECT (100 * foods.food_id) AS nutrient_id, foods.food_id, \'1 gm\' AS measure_name, 1.0 AS grams FROM (SELECT DISTINCT(food_id) FROM nutrition_measure) AS foods;')
+    run_psql_command('''
+INSERT into
+    nutrition_measure
+SELECT
+    (100 * foods.food_id) AS nutrient_id, foods.food_id, \'1 gm\' AS measure_name, 1.0 AS grams
+FROM
+    (SELECT DISTINCT(food_id) FROM nutrition_food) AS foods;''')
 
 def load_recipe_category(data_dir):
     psql_truncate_table('nutrition_recipe_category')
@@ -132,20 +138,20 @@ def load_all_tables(sr20_dir):
 #    load_nutrient_definition(sr20_dir + '/NUTR_DEF.txt')
     load_nutrient_data(sr20_dir + '/NUT_DATA.txt')
     load_measure(sr20_dir + '/WEIGHT.txt')
-    current_dir = os.getcwd()
-    load_recipe_category(current_dir)
-    load_nutrient_score(current_dir)
+#     current_dir = os.getcwd()
+#     load_recipe_category(current_dir)
+#     load_nutrient_score(current_dir)
 
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv, "cd:")
+        opts, args = getopt.getopt(argv, "dl:")
     except getopt.GetoptError, err:
         print str(err)
         sys.exit(2)
     for o, a in opts:
-        if o == "-c":
+        if o == "-d":
             drop_all_tables()
-        elif o == "-d":
+        elif o == "-l":
             load_all_tables(a)
         else:
             assert False, "unhandled option"

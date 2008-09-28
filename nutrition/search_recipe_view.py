@@ -17,7 +17,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
-from django import newforms as forms
+from django import forms
 
 from models import *
 
@@ -30,48 +30,46 @@ class RecipeSearchForm(forms.Form):
         self.fields['category'].choices = [(c.category_id, c.category_name)
                                            for c in get_recipe_categories()]
 
+class RecipeDelete(forms.Form):
+    check = forms.BooleanField(required=False)
+
 @login_required
 def search_recipe(request):
-    data = request.GET.copy()
+    data = request.POST.copy()
     if data.has_key('text'):
         first_show = False
     else:
         first_show = True
-    form = RecipeSearchForm(request.GET)
-    if form.is_valid():
-        text = form.cleaned_data['text']
-        category = int(form.cleaned_data['category'])
+
+    recipe_search_form = RecipeSearchForm(request.POST)
+    check_recipe_list = []
+    text = ''
+
+    if data.has_key('delete'):
+        for key, value in data.items():
+            if key.find('check') != -1 and value == 'on':
+                recipe_id = key[:-6]
+                delete_recipe_owned_by_user(request.user, recipe_id)
+
+    if recipe_search_form.is_valid():
+        text = recipe_search_form.cleaned_data['text']
+        category = int(recipe_search_form.cleaned_data['category'])
         recipes = get_recipes_matching(text, category)
-    else:
-        recipes = []
-        text = ''
+        # TODO: only have check boxes against recipes owned by user
+        own_recipes = filter_recipes_owned_by_user(request.user, recipes)
+        check_recipe_list = []
+        for r in recipes:
+            form_data = {'%s_check' % r.recipe_id : False}
+            recipe_delete_form = RecipeDelete(form_data, prefix=r.recipe_id)
+            recipe_delete_form.recipe_id = r.recipe_id
+            recipe_delete_form.recipe_name = r.recipe_name
+            recipe_delete_form.username = request.user.username
+            check_recipe_list.append(recipe_delete_form)
 
-    return render_to_response( 'recipe_search.html', {
-            "form": form,
+
+    return render_to_response( 'search_recipe.html', {
+            "form": recipe_search_form,
             "first_show": first_show,
             "text": text,
-            "recipes": recipes
-            })
-
-@login_required
-def search_edit_recipe(request):
-    data = request.GET.copy()
-    if data.has_key('text'):
-        first_show = False
-    else:
-        first_show = True
-    form = RecipeSearchForm(request.GET)
-    if form.is_valid():
-        text = form.cleaned_data['text']
-        category = int(form.cleaned_data['category'])
-        recipes = get_recipes_matching_owned_by_user(request.user, text, category)
-    else:
-        recipes = []
-        text = ''
-
-    return render_to_response( 'search_edit_recipe.html', {
-            "form": form,
-            "first_show": first_show,
-            "text": text,
-            "recipes": recipes
+            "recipes": check_recipe_list
             })

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "menu.html" %}
 
 {% comment %}
   web_nutrition: a web based nutrition and diet analysis program.
@@ -22,10 +22,12 @@
 
 {% block menu_edit_recipe %}class="active"{% endblock %}
 
-{% block page_css %}<link rel="stylesheet" type="text/css" href="/site_media/styles/edit_recipe_search.css" />{% endblock %}
+{% block page_css %}
+<link rel="stylesheet" type="text/css" href="/site_media/styles/recipe_search.css" />
+{% endblock %}
 
 {% block content %}
-  <form id="recipe-edit-search-form" action="." method="GET">
+  <form id="recipe-search-form" action="." method="POST">
     <div class="label-input">
       <label id="food-text" for="id_text" class="labelclass">Recipe to Search :</label>
       {{ form.text|escape }}
@@ -37,28 +39,37 @@
       <label id="food-text" for="id_category" class="labelclass">Recipe Category :</label>
       {{ form.category|escape }}
     </div>
-    <input class="button" type="submit" value="Search">
-  </form>
-
-  {% if not recipes %}
-  <br />
-  <br />
-  <br />
-  <br />
-  {% endif %}
+    <input class="button" name="search" type="submit" value="Search">
 
   {% if text %}
     <h2>Recipes Found :</h2>
-    <p>select recipe to edit.</p>
-    <p>You can only edit recipes that you have created.</p>
     {% if recipes %}
-      <ul id="links">
-        {% for recipe in recipes %}
-          <li><a class="{% cycle 'odd' 'even' %}" href="/edit_recipe/recipe_id/{{ recipe.recipe_id|stringformat:"d" }}">{{ recipe.recipe_name }}</a></li>
-        {% endfor %}
-      </ul>
+    <table border="1" class="table-class">
+      <tr>
+        <th class="first"></th>
+        <th class="second">Recipe</th>
+        <th class="third">Owner</th>
+      </tr>
+      {% for r in recipes %}
+      <tr class="{% cycle 'odd' 'even' %}">
+        <td class="first">
+          {{ r.check }}
+        </td>
+        <td class="second">
+          <a href="/search_recipe/recipe_id/{{ r.recipe_id|stringformat:"d" }}">{{ r.recipe_name }}</a>
+        </td>
+        <td class="third">
+          {{ r.username }}
+        </td>
+      </tr>
+    {% endfor %}
+    </table>
+
+    <input class="button" name="delete" type="submit" value="Delete Checked">
     {% else %}
       <p>No Recipes Found</p>
     {% endif %}
   {% endif %}
+  </form>
+
 {% endblock %}

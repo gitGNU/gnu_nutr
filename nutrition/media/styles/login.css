@@ -14,66 +14,34 @@
 /* You should have received a copy of the GNU Affero General Public License */
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-#recipe-edit-search-form
+#login-form
 {
-  padding-bottom: 1em;
+  width: 28em;
+  background-color: #EBECE4;
+  margin: 5em;
+  padding: 2em;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #000;
 }
 
-#recipe-edit-search-form label
+#login-form label
 {
   display: block;
 }
 
-#recipe-edit-search-form input
+#login-form input
 {
   width: 30em;
 }
 
-#recipe-edit-search-form .label-input
+#login-form .label-input
 {
   padding-bottom: 0.5em;;
 }
 
-#recipe-edit-search-form input.button
+#login-form input.button
 {
-  width: 10em;
+  width: auto;
 }
 
-div#container
-{
-  /* left-hs + #food-search-form input + 1 */
-  min-width: 47em;
-}
-
-ul
-{
-  margin-left: 0;
-  padding-left: 0;
-}
-
-#links li
-{
-  list-style: none;
-}
-
-#links a
-{
-  display: block;
-  color: #0000FF;
-  text-decoration: none;
-}
-
-#links a.odd
-{
-  background: #E8E8E8;
-}
-
-#links a:visited
-{
-  color: #0000FF;
-}
-
-#links a:hover
-{
-  text-decoration: underline;
-}

@@ -14,15 +14,29 @@
 /* You should have received a copy of the GNU Affero General Public License */
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-table.rdi-table {
+div#nutr_search_result
+{
+  padding: 1em;
+}
+
+table.nutrient-search-result-table {
   border-color: #000;
-  border-width: 1px;
   border-style: solid;
   border-collapse: collapse;
   width: 100%;
+  border-width: 1px;
 }
 
-table.rdi-table td,  table.rdi-table th {
+table.nutrient-search-result-table th {
+  border-color: #000;
+  border-width: 1px;
+  border-style: solid;
+  padding-left: 1em;
+  padding-right: 1em;
+  text-align: left;
+}
+
+table.nutrient-search-result-table td {
   border-color: #000;
   border-width: 1px;
   border-style: solid;
@@ -30,12 +44,4 @@ table.rdi-table td,  table.rdi-table th {
   padding-right: 1em;
   height: 1.5em;
   text-align: left;
-  width: 33%;
 }
-
-
-
-
-
-
-

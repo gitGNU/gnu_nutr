@@ -14,29 +14,38 @@
 /* You should have received a copy of the GNU Affero General Public License */
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-.highlight
-{
+.highlight {
   font-weight: bold;
 }
 
-p
-{
+p {
   margin: 0;
   padding-bottom: 0.5em;
 }
 
-p.third
-{
+p.third {
   margin: 0;
   padding-bottom: 1.5em;
 }
 
-#nav
-{
-  padding-top: 1em;
+#edit-recipe {
+  margin-top: 1em;
 }
 
-#edit-recipe
-{
-  margin-top: 1em;
+table.ingredient-table {
+  border-color: #000;
+  border-width: 1px;
+  border-style: solid;
+  width: 99.9%;
+  margin-left: 0.1em;
+  margin-bottom: 1em;
+  border-collapse: collapse;
+}
+
+table.ingredient-table th, tr, td {
+  text-align: left;
+  border-color: #000;
+  border-width: 1px;
+  border-style: solid;
+  padding-left: 1em;
 }

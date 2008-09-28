@@ -87,11 +87,15 @@ TEMPLATE_DIRS = (
     '/home/edenny/nutr/nutrition/templates'
 )
 
+ACCOUNT_ACTIVATION_DAYS = 1
+
 INSTALLED_APPS = (
     'django.contrib.auth',
+    'django.contrib.humanize',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
+    'registration',
     'nutr.nutrition'
 )

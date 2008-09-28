@@ -19,7 +19,7 @@ from django.conf import settings
 
 from nutr.nutrition.selected_food_view import selected_food
 from nutr.nutrition.food_search_view import food_search
-from nutr.nutrition.menu_view import menu
+from nutr.nutrition.main_view import main
 from nutr.nutrition.recipe_view import create_recipe
 from nutr.nutrition.ingredient_search_view import add_ingredient
 from nutr.nutrition.daily_plan_view import daily_plan
@@ -27,7 +27,7 @@ from nutr.nutrition.plan_add_food_view import plan_add_food
 from nutr.nutrition.plan_add_recipe_view import plan_add_recipe
 from nutr.nutrition.nutrient_search_view import nutrient_search
 from nutr.nutrition.nutrient_search_result_view import nutrient_search_result
-from nutr.nutrition.search_recipe_view import search_recipe, search_edit_recipe
+from nutr.nutrition.search_recipe_view import search_recipe
 from nutr.nutrition.selected_recipe_view import selected_recipe
 from nutr.nutrition.set_rdi_view import set_rdi
 from nutr.nutrition.register import register
@@ -36,8 +36,9 @@ from django.contrib.auth.views import login, logout
 
 urlpatterns = \
     patterns('',
-             (r'^menu/$', menu),
+             (r'^$', login),
              (r'^accounts/login/$', login),
+             (r'main/$', main),
              (r'register/$', register),
              (r'set_rdi/$', set_rdi),
              (r'food_search/$', food_search),
@@ -55,7 +56,6 @@ urlpatterns = \
              (r'nutrient_search_result/(?P<food_group>\d+)/(?P<nutr1>\d+)/(?P<fact1>-{0,1}\d{1})/(?P<nutr2>\d+)/(?P<fact2>-{0,1}\d{1})/$', nutrient_search_result),
              (r'nutrient_search_result/(?P<food_group>\d+)/(?P<nutr1>\d+)/(?P<fact1>-{0,1}\d{1})/(?P<nutr2>\d+)/(?P<fact2>-{0,1}\d{1})/(?P<nutr3>\d+)/(?P<fact3>-{0,1}\d{1})/$', nutrient_search_result),
              (r'edit_recipe/recipe_id/(?P<recipe_id>\d+)/$', create_recipe),
-             (r'search_edit_recipe/$', search_edit_recipe),
              (r'daily_plan/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', daily_plan),
              (r'daily_plan/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/food_id/(?P<food_id>\d+)/$', daily_plan),
              (r'daily_plan/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/recipe_id/(?P<recipe_id>\d+)/$', daily_plan),

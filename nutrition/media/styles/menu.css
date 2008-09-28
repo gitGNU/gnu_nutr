@@ -1,0 +1,183 @@
+/* web_nutrition: a web based nutrition and diet analysis program. */
+/* Copyright (C) 2008 Edgar Denny */
+
+/* This program is free software: you can redistribute it and/or modify */
+/* it under the terms of the GNU Affero General Public License as */
+/* published by the Free Software Foundation, either version 3 of the */
+/* License, or (at your option) any later version. */
+
+/* This program is distributed in the hope that it will be useful, */
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the */
+/* GNU Affero General Public License for more details. */
+
+/* You should have received a copy of the GNU Affero General Public License */
+/* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+html {
+  background-color: white;
+  color: #000;
+  font-family: Verdana, Lucida, Helvetica, Arial, sans-serif;
+  font-size: 0.85em;
+  line-height: 1.5em;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+form {
+  margin-bottom: 1em;
+  padding: 0.5em;
+  /*   border: 1px solid #000; */
+}
+
+form label {
+  padding-right: 0.5em;
+}
+
+div #food-amount {
+  display: inline;
+}
+
+.errors {
+  color: #FF0000;
+}
+
+div #food-measure {
+  padding-left: 2em;
+  display: inline;
+}
+
+dl {
+  margin-top: 0em;
+  margin-bottom: 0.5em;
+}
+
+dt {
+  margin-top: 1em;
+}
+
+h1, h2, h3, h4, h5, h6
+{
+  font-weight: normal;
+  color: #000;
+  line-height: 1.2em;
+}
+
+h1 {
+  font-size: 1.6em;
+}
+
+h2 {font-size: 1.4em;}
+h3 {font-size: 1.3em;}
+h4 {font-size: 1.2em;}
+h5, h6 {font-size: 1em;}
+
+div#container {
+  margin-top: 1em;
+  margin-left: 1em;
+  margin-right: 1em;
+  margin-bottom: 1em;
+  background-color: #ddd;
+  border: 1px solid gray;
+}
+
+div#header {
+  padding: .5em;
+  background-color: #ddd;
+  border-bottom: 1px solid gray;
+}
+
+div#header h1 {
+  padding: 0;
+  margin: 0;
+}
+
+.colmask {
+  position: relative;  /* This fixes the IE7 overflow hidden bug and stops the layout jumping out of place */
+  clear: both;
+  float: left;
+  width: 100%;       /* width of whole page */
+  overflow: hidden;  /* This chops off any overhanging divs */
+}
+
+.leftmenu {
+  background: #cfc;
+}
+
+.leftmenu .colright {
+  float: left;
+  width: 200%;
+  position: relative;
+  left: 16em;
+  background: #fff;
+}
+.leftmenu .col1wrap {
+  float: right;
+  width: 50%;
+  position:relative;
+  right: 16em;
+  padding-bottom: 1em;
+}
+
+.leftmenu .right-hs {
+  margin: 0 1em 0 17em;
+  position: relative;
+  right: 100%;
+  overflow: hidden;
+}
+
+.leftmenu .left-hs {
+  float: left;
+  width: 16em;
+  position: relative;
+  right: 16em;
+}
+
+.left-hs div#menu h4 {
+  padding: 0;
+  margin: 2px 0 2px 2px;
+  text-align: left;
+  text-indent: 2em;
+  background: #ddd;
+  font-weight: bold;
+}
+
+.left-hs div#menu a {
+  text-decoration: none;
+  font-weight: bold;
+  color: #0000FF;
+  display: block;
+  background: #EBECE4;
+  margin: 2px 0 2px 2px;
+  padding: 0;
+  text-align: left;
+  text-indent: 2em;
+}
+
+.left-hs div#menu a.active {
+  background: #A9A9A9;
+}
+
+.left-hs div#menu a:hover {
+  text-decoration: underline;
+  background: #ddd;
+}
+
+.left-hs div#menu a:visited {
+  color: #0000FF;
+}
+
+div#footer {
+  clear: both;
+  background-color: #ddd;
+  border-top: 1px solid gray;
+}
+
+div#footer h5 {
+  padding: 1em;
+  margin: 0;
+}
+

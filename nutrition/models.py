@@ -46,17 +46,25 @@ class Food(models.Model):
     class Admin:
         pass
 
-def get_food_from_food_str(food_str, group_id):
+def get_food_from_food_str(food_str, group_id, start_range, end_range):
     if group_id == 0:
-        return Food.objects.filter(food_name__icontains = food_str)
+        foods = Food.objects.filter(food_name__icontains = food_str).order_by('food_id')
+        return foods[start_range:end_range], foods.count()
     else:
-        return Food.objects.filter(group_id = group_id).filter(food_name__icontains = food_str)
+        foods = Food.objects.filter(group_id = group_id).filter(food_name__icontains = food_str).order_by('food_id')
+        return foods[start_range:end_range], foods.count()
 
 def get_food(food_id):
-    return Food.objects.get(food_id=food_id)
+    try:
+        return Food.objects.get(food_id=food_id)
+    except Food.DoesNotExist:
+        return None
 
 def food_id_2_name(food_id):
-    return Food.objects.get(food_id=food_id).food_name
+    try:
+        return Food.objects.get(food_id=food_id).food_name
+    except Food.DoesNotExist:
+        return None
 
 def get_foods_from_food_id_list(food_id_list):
     return Food.objects.filter(food_id__in=food_id_list)
@@ -96,7 +104,10 @@ class Nutrient_Data(models.Model):
         pass
 
 def get_calories_per_100gm(food_id):
-    return Nutrient_Data.objects.filter(food_id=food_id).filter(nutrient_id=208).get().value
+    try:
+        return Nutrient_Data.objects.filter(food_id=food_id).filter(nutrient_id=208).get().value
+    except Nutrient_Data.DoesNotExist:
+        return None
 
 def get_nutrient_data_for_food(food_id):
     return Nutrient_Data.objects.filter(food_id=food_id)
@@ -130,14 +141,20 @@ def get_measure_from_measure_list(measure_list, measure_id):
     return None
 
 def get_grams_per_measure(food_id, measure_id):
-    return Measure.objects.filter(food_id=food_id).filter(measure_id=measure_id).get().grams
+    try:
+        return Measure.objects.filter(food_id=food_id).filter(measure_id=measure_id).get().grams
+    except Measure.DoesNotExist:
+        return None
 
 # ------------------------------------------------------------
 
 def get_calories(food_id, measure_id, num_measures):
     calories_per_100gm = get_calories_per_100gm(food_id)
     grams_per_measure = get_grams_per_measure(food_id, measure_id)
-    return calories_per_100gm * num_measures * grams_per_measure / 100.0
+    if calories_per_100gm and grams_per_measure:
+        return calories_per_100gm * num_measures * grams_per_measure / 100.0
+    else:
+        return 0.0
 
 def get_ingredient_calories(ingredient_form, food_id):
     food_id = int(food_id)
@@ -202,9 +219,10 @@ def get_food_nutrient_data(food_id, num_measures, measure_id, user):
     nutrient_data_list = get_nutrient_data_for_food(food_id)
     grams = get_grams_per_measure(food_id, measure_id)
 
-    for o in nutrient_data_list:
-        if o.nutrient_id in rdi_dict:
-            nutr_dict[o.nutrient_id] = o.value * num_measures * grams / 100.0
+    if grams:
+        for o in nutrient_data_list:
+            if o.nutrient_id in rdi_dict:
+                nutr_dict[o.nutrient_id] = o.value * num_measures * grams / 100.0
 
     nutrients = populate_nutrient_values(nutr_dict, rdi_dict)
 
@@ -365,7 +383,10 @@ def get_recipe_categories():
     return Recipe_Category.objects.all().order_by('category_id')
 
 def get_recipe_category(category_id):
-    return Recipe_Category.objects.get(category_id=category_id)
+    try:
+        return Recipe_Category.objects.get(category_id=category_id)
+    except Recipe_Category.DoesNotExist:
+        return None
 
 # ------------------------------------------------------------
 
@@ -394,6 +415,12 @@ def get_recipes_matching_owned_by_user(user, text, category_id):
     else:
         return Recipe.objects.filter(user=user).filter(category_id=category_id).filter(recipe_name__icontains=text)
 
+def filter_recipes_owned_by_user(user, recipe_objects):
+    if recipe_objects:
+        return recipe_objects.filter(user=user)
+    else:
+        return None
+
 def get_recipe_exact_match_owned_by_user(user, recipe_name):
     o = Recipe.objects.filter(user=user).filter(recipe_name=recipe_name)
     if o:
@@ -401,13 +428,30 @@ def get_recipe_exact_match_owned_by_user(user, recipe_name):
     return None
 
 def get_recipe(recipe_id):
-    return Recipe.objects.filter(recipe_id=recipe_id).get()
+    try:
+        return Recipe.objects.filter(recipe_id=recipe_id).get()
+    except Recipe.DoesNotExist:
+        return None
 
 def get_recipe_owned_by_user(user, recipe_id):
-    return Recipe.objects.filter(user=user).filter(recipe_id=recipe_id).get()
+    try:
+        return Recipe.objects.filter(user=user).filter(recipe_id=recipe_id).get()
+    except Recipe.DoesNotExist:
+        return None
 
 def get_recipe_name(recipe_id):
-    return Recipe.objects.filter(recipe_id=recipe_id).get().recipe_name
+    try:
+        return Recipe.objects.filter(recipe_id=recipe_id).get().recipe_name
+    except Recipe.DoesNotExist:
+        return None
+    return
+
+def delete_recipe_owned_by_user(user, recipe_id):
+    r = get_recipe_owned_by_user(user, recipe_id)
+    if r:
+        Ingredient.objects.filter(recipe_id=r.recipe_id).delete()
+        Recipe_Nutrient_Data.objects.filter(recipe_id=r.recipe_id).delete()
+        r.delete()
 
 # ------------------------------------------------------------
 
@@ -453,32 +497,35 @@ def save_recipe_to_database(user, recipe_form, ingredient_form_list):
 
     # delete any old recipes with the same name.
     r1 = get_recipe_exact_match_owned_by_user(user, recipe_form_data['name'])
+    old_recipe_id = None
     if r1:
+        old_recipe_id = r1.recipe_id
         Ingredient.objects.filter(recipe_id=r1.recipe_id).delete()
         Recipe_Nutrient_Data.objects.filter(recipe_id=r1.recipe_id).delete()
         r1.delete()
 
     # Try and re-use an existing recipe_id owned by user
-    if r1:
-        recipe_id = r1.recipe_id
+    if old_recipe_id:
+        recipe_id = old_recipe_id
     else:
         recipe_id = None
 
     num_servings = recipe_form_data['num_servings']
     category_id = recipe_form_data['category']
+    category = get_recipe_category(category_id)
 
     if recipe_id:
         r = Recipe(user=user,
                    recipe_id=recipe_id,
                    recipe_name=recipe_form_data['name'],
                    category_id=category_id,
-                   category_name=get_recipe_category(category_id).category_name,
+                   category_name=category.category_name,
                    number_servings=num_servings)
     else:
         r = Recipe(user=user,
                    recipe_name=recipe_form_data['name'],
                    category_id=category_id,
-                   category_name=get_recipe_category(category_id).category_name,
+                   category_name=category.category_name,
                    number_servings=num_servings)
     r.save()
 
@@ -687,11 +734,12 @@ def save_plan_to_db(user, plan_form_list, year, month, day):
             name = get_recipe_name(form.item_id)
         else:
             continue
-        o = Plan(order=i, user=user, plan_date=plan_date, measure=measure,
-                 item_id=form.item_id, item_type=item_type,
-                 num_measures=plan_data['num_measures'],
-                 name=name)
-        o.save()
+        if name:
+            o = Plan(order=i, user=user, plan_date=plan_date, measure=measure,
+                     item_id=form.item_id, item_type=item_type,
+                     num_measures=plan_data['num_measures'],
+                     name=name)
+            o.save()
 
 def get_user_plan(user, year, month, day):
     plan_date = datetime.date(int(year), int(month), int(day))

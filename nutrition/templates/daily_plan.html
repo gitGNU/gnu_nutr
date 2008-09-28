@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "menu.html" %}
 
 {% comment %}
 web_nutrition: a web based nutrition and diet analysis program.
@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% block menu_daily_plan %}class="active"{% endblock %}
 
 {% block page_css %}
+<link rel="stylesheet" type="text/css" href="/site_media/styles/nutrient_table_class.css" />
 <link rel="stylesheet" type="text/css" href="/site_media/styles/plan.css" />
 <link rel="stylesheet" type="text/css" href="/site_media/styles/ui.tabs.css" />
 <link rel="stylesheet" type="text/css" href="/site_media/styles/ui.datepicker.css" />
@@ -35,19 +36,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <script type="text/javascript" src="/site_media/javascript/ui.datepicker.js"></script>
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function(){
-  $("#id_copy_date").datepicker({dayNamesMin: ['S','M','T','W','T','F','S'], mandatory: true, speed: 'fast', changeMonth: false, dateFormat: 'yy/m/d', buttonText: 'Choose', showOn:'button', buttonImage: '/site_media/images/calendar.gif', buttonImageOnly: true});
+    $("#id_copy_date").datepicker({
+    dayNamesMin: ['S','M','T','W','T','F','S'],
+      mandatory: true,
+      speed: 'fast',
+      changeMonth: false,
+      dateFormat: 'yy/m/d',
+      buttonText: 'Choose',
+      showOn:'button',
+      buttonImage: '/site_media/images/calendar.gif',
+      buttonImageOnly: true,
+      defaultDate : {{ days_from_today }}
+    });
 
-  $("#ui-datepicker").datepicker({
-  changeFirstDay: false,
-  dayNamesMin: ['S','M','T','W','T','F','S'],
-  dateFormat: 'yy/m/d',
-  onSelect: goToPage});
+    $("#ui-datepicker").datepicker({
+      changeFirstDay: false,
+      dayNamesMin: ['S','M','T','W','T','F','S'],
+      dateFormat: 'yy/m/d',
+      onSelect: goToPage,
+      defaultDate : {{ days_from_today }}
+    });
 
-  function goToPage(dateStr) {
-  window.location = '/daily_plan/' + dateStr;
-  }
+    function goToPage(dateStr) {
+    window.location = '/daily_plan/' + dateStr;
+    }
 
-  $("#tabs > ul").tabs();
+    $("#tabs > ul").tabs();
   });
 </script>
 {% endblock %}
@@ -72,7 +86,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <input type="submit" name="copy_plan" value="Copy Plan" />
 
   <div id="plan-form-container">
-    <table border="1">
+    <table border="1" class="plan-table-class">
       <tr>
         <th class="first"></th>
         <th class="second">Amount</th>
@@ -82,7 +96,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       </tr>
       {% for item in plan_list %}
       <tr>
-        <td class="first">{{ item.check|escape }}
+        <td class="first">{{ item.check }}
           {% if item.check.errors %}<span class="errors">*</span>{% endif %}
         </td>
         <td class="second">{{ item.num_measures|escape }}
@@ -134,7 +148,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <li><a href="#fats"><span>Fats</span></a></li>
   </ul>
   <div id="macro">
-    <table>
+    <table class="nutrient-table-class">
       <tr>
         <th>Nutrient</th>
         <th colspan="2">Value</th>
@@ -156,7 +170,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </table>
   </div>
   <div id="vitamins">
-    <table>
+    <table class="nutrient-table-class">
       <tr>
         <th>Nutrient</th>
         <th colspan="2">Value</th>
@@ -178,7 +192,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </table>
   </div>
   <div id="minerals">
-    <table>
+    <table class="nutrient-table-class">
       <tr>
         <th>Nutrient</th>
         <th colspan="2">Value</th>
@@ -200,7 +214,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </table>
   </div>
   <div id="aminos">
-    <table>
+    <table class="nutrient-table-class">
       <tr>
         <th>Nutrient</th>
         <th colspan="2">Value</th>
@@ -222,7 +236,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </table>
   </div>
   <div id="fats">
-    <table>
+    <table class="nutrient-table-class">
       <tr>
         <th>Nutrient</th>
         <th colspan="2">Value</th>

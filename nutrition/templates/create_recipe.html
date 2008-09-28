@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "menu.html" %}
 
 {% comment %}
   web_nutrition: a web based nutrition and diet analysis program.
@@ -24,6 +24,7 @@
 
 {% block page_css %}
   <link rel="stylesheet" type="text/css" href="/site_media/styles/ui.tabs.css" />
+  <link rel="stylesheet" type="text/css" href="/site_media/styles/nutrient_table_class.css" />
   <link rel="stylesheet" type="text/css" href="/site_media/styles/create_recipe.css" />
 {% endblock %}
 
@@ -61,7 +62,7 @@
      {% if recipe.category.errors %}<span class="errors">*</span>{% endif %}
    </div>
    <div id="ingredientform">
-      <table class="recipeingredients">
+      <table class="ingredient-table">
         <tr>
           <th class="first"></th>
           <th class="second">Amount</th>
@@ -80,12 +81,18 @@
           <td class="third">{{ ingredient.measure|escape }}
             {% if ingredient.measure.errors %}<span class="errors">*</span>{% endif %}
           </td>
-          <td class="fourth"><a href="/food_search/food_id/{{ ingredient.food_id }}/measure/{{ ingredient.measure_str }}/num_measures/{{ ingredient.amount }}">{{ ingredient.food_name }}</a></td>
+          <td class="fourth"><a href="/food_search/food_id/{{ ingredient.food_id }}/measure/{{ ingredient.measure_id }}/num_measures/{{ ingredient.amount }}">{{ ingredient.food_name }}</a></td>
           <td class="fifth"> {{ ingredient.calories|stringformat:".2f" }}</td>
         </tr>
         {% endfor %}
         {% for item in filler_list %}
-          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr>
+            <td class="first"></td>
+            <td class="second"></td>
+            <td class="third"></td>
+            <td class="fourth"></td>
+            <td class="fifth"></td>
+          </tr>
         {% endfor %}
       </table>
     <div id="buttons">
@@ -108,7 +115,7 @@
       <li><a href="#fats"><span>Fats</span></a></li>
     </ul>
     <div id="macro">
-      <table>
+      <table class="nutrient-table-class">
         <tr>
           <th>Nutrient</th>
           <th colspan="2">Value</th>
@@ -130,7 +137,7 @@
       </table>
     </div>
     <div id="vitamins">
-      <table>
+      <table class="nutrient-table-class">
         <tr>
           <th>Nutrient</th>
           <th colspan="2">Value</th>
@@ -152,7 +159,7 @@
       </table>
     </div>
     <div id="minerals">
-      <table>
+      <table class="nutrient-table-class">
         <tr>
           <th>Nutrient</th>
           <th colspan="2">Value</th>
@@ -174,7 +181,7 @@
       </table>
     </div>
     <div id="aminos">
-      <table>
+      <table class="nutrient-table-class">
         <tr>
           <th>Nutrient</th>
           <th colspan="2">Value</th>
@@ -196,7 +203,7 @@
       </table>
     </div>
     <div id="fats">
-      <table>
+      <table class="nutrient-table-class">
         <tr>
           <th>Nutrient</th>
           <th colspan="2">Value</th>

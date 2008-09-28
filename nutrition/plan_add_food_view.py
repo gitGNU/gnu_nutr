@@ -17,40 +17,14 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
-from django import newforms as forms
+from django import forms
 
 from models import *
-
-class FoodSearchForm(forms.Form):
-    text = forms.CharField(max_length=60)
-    food_group = forms.ChoiceField()
-
-    def __init__(self, *args, **kwargs):
-        super(FoodSearchForm, self).__init__(*args, **kwargs)
-        self.fields['food_group'].choices = [(g.group_id, g.group_name)
-                                             for g in get_food_groups()]
+from food_search_view import process_food_search_request
 
 @login_required
 def plan_add_food(request):
-    search_text = ""
-    foods = []
-    data = request.GET.copy()
-
+    dict = process_food_search_request(request)
     base_path = request.get_full_path().rsplit('/',2)[0]
-
-    if data.has_key('text'):
-        first_render = False
-    else:
-        first_render = True
-    form = FoodSearchForm(data)
-    if form.is_valid():
-        search_text = form.cleaned_data['text']
-        foods = get_food_from_food_str(search_text,
-                                       int(form.cleaned_data['food_group']))
-
-    return render_to_response("plan_add_food.html", {
-            "first_render": first_render,
-            "search_text": search_text,
-            "form": form,
-            "base_path": base_path,
-            "foods": foods})
+    dict['base_path'] = base_path
+    return render_to_response("plan_add_food.html", dict)

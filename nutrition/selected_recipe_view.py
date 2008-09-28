@@ -14,10 +14,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
-from django import newforms as forms
+from django import forms
 
 from models import *
 
@@ -39,6 +39,8 @@ class IngredientData:
 @login_required
 def selected_recipe(request, recipe_id):
     r = get_recipe(recipe_id)
+    if not r:
+        raise Http404
     recipe = RecipeData(recipe_id, r.recipe_name, r.category_name,
                         r.number_servings)
     ingredients = get_ingredients(recipe_id)
@@ -55,8 +57,6 @@ def selected_recipe(request, recipe_id):
         owner = True
     else:
         owner = False
-
-    print 'ingredient_list = ', ingredient_list
 
     return render_to_response( 'selected_recipe.html', {
             "recipe": recipe,

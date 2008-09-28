@@ -1,36 +1,39 @@
-{% extends "base.html" %}
+{% extends "menu.html" %}
 
 {% comment %}
-  web_nutrition: a web based nutrition and diet analysis program.
-  Copyright (C) 2008 Edgar Denny
+web_nutrition: a web based nutrition and diet analysis program.
+Copyright (C) 2008 Edgar Denny
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Affero General Public License as
-  published by the Free Software Foundation, either version 3 of the
-  License, or (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU Affero General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
 
-  You should have received a copy of the GNU Affero General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
 {% block title %}Search Nutrient{% endblock %}
 
 {% block menu_nutrient_search %}class="active"{% endblock %}
 
-{% block page_css %}<link rel="stylesheet" type="text/css" href="/site_media/styles/nutrient_search.css" />{% endblock %}
+{% block page_css %}
+<link rel="stylesheet" type="text/css" href="/site_media/styles/nutrient_search.css" />
+{% endblock %}
 
 {% block content %}
-  <form id="nutrient-search-form" action="." method="GET">
+<div id="nutr-search">
+  <form action="." method="GET">
     <div class="label-input">
       <label id="food-group" for="id_food_group" class="labelclass">Search in Food Group :</label>
       {{ form.food_group }}
     </div>
-    <table id="nutrient-search-table">
+    <table class="nutrient-search-table">
       <tr>
         <th>Nutrient</th>
         <th>Factor</th>
@@ -63,4 +66,5 @@
     <br />
     <input class="button" type="submit" name="search" value="Search" />
   </form>
+</div>
 {% endblock %}

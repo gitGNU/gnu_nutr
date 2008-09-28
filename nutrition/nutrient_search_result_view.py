@@ -14,10 +14,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
-from django import newforms as forms
+from django import forms
 
 from models import *
 from constants import tracked_nutr_id_2_name_dict
@@ -60,6 +60,10 @@ def append_to_lists(nutr_id_list, factor_list, nutr, factor):
 def nutrient_search_result(request, food_group=None, nutr1=None, fact1=None,
                            nutr2=None, fact2=None,
                            nutr3=None, fact3=None):
+    group_ids = [g.group_id for g in get_food_groups()]
+    if int(food_group) not in group_ids:
+        raise Http404
+
     nutr_name = Nutrient_Name()
     score_query = ''
     select_query = ''
@@ -82,8 +86,11 @@ def nutrient_search_result(request, food_group=None, nutr1=None, fact1=None,
         factor = factor_list[i]
         if nutr_id in rdi_dict and rdi_dict[nutr_id] != 0.0:
             factor /= rdi_dict[nutr_id]
-        elif int_nutr_id in max_dict and max_dict[nutr_id] != 0.0:
+        elif nutr_id in max_dict and max_dict[nutr_id] != 0.0:
             factor /= max_dict[nutr_id]
+        else:
+            # The nutr_id is not found in rdi_dict or max_dict. It's invalid.
+            raise Http404
         if score_query != '':
             score_query += ' + '
 

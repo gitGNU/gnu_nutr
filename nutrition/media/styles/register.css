@@ -14,28 +14,34 @@
 /* You should have received a copy of the GNU Affero General Public License */
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-table.rdi-table {
-  border-color: #000;
+#register-form
+{
+  width: 28em;
+  background-color: #EBECE4;
+  margin: 5em;
+  padding: 2em;
   border-width: 1px;
   border-style: solid;
-  border-collapse: collapse;
-  width: 100%;
-}
-
-table.rdi-table td,  table.rdi-table th {
   border-color: #000;
-  border-width: 1px;
-  border-style: solid;
-  padding-left: 1em;
-  padding-right: 1em;
-  height: 1.5em;
-  text-align: left;
-  width: 33%;
 }
 
+#register-form label
+{
+  display: block;
+}
 
+#register-form input
+{
+  width: 30em;
+}
 
+#register-form input#id_password2
+{
+  margin-bottom: 0.5em;
+}
 
-
-
+#register-form input.button
+{
+  width: auto;
+}
 
